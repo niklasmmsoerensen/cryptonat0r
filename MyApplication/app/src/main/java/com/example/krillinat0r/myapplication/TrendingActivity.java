@@ -1,14 +1,8 @@
 package com.example.krillinat0r.myapplication;
 
-import android.content.ComponentName;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -18,49 +12,26 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ListView;
 
-import java.util.ArrayList;
-import java.util.List;
+public class TrendingActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener {
 
-public class OverviewActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-
-    private ListView CurrencyList;
-    private CurrencyListAdapter adapter;
-    private IntentFilter filter;
-    private List<CurrencyData> mCurrencyDataList = new ArrayList<>();
-
-    //for bound counting service
-    //private updateService UpdateService;
-    private ServiceConnection updateServiceConnection;
-    private boolean bound = false;
-
-    //Drawer / navigationview
     private DrawerLayout drawer;
     private NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_overview);
-
-        CurrencyList = findViewById(R.id.Currency_List);
-
-        //Init adapter
-       // adapter = new CurrencyListAdapter(getApplicationContext(), mCurrencyDataList);
-       // CurrencyList.setAdapter(adapter);
-       // setupConnectionToCountingService();
-
+        setContentView(R.layout.activity_trending);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.Add_Coin_Btn);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(OverviewActivity.this, TrendingActivity.class);
-                startActivity(intent);
-
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
             }
         });
 
@@ -77,7 +48,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
     @Override
     public void onStart()
     {
-        navigationView.getMenu().getItem(0).setChecked(true);
+        navigationView.getMenu().getItem(1).setChecked(true);
         super.onStart();
     }
 
@@ -94,7 +65,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.overview, menu);
+        getMenuInflater().inflate(R.menu.trending, menu);
         return true;
     }
 
@@ -119,30 +90,13 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_trending_currencies)
+        if (id == R.id.nav_my_currencies)
         {
-            Intent startTrendingActivity = new Intent(OverviewActivity.this, TrendingActivity.class);
-            startActivity(startTrendingActivity);
+            finish();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
-    }
-
-    private void setupConnectionToCountingService(){
-        updateServiceConnection = new ServiceConnection() {
-            public void onServiceConnected(ComponentName className, IBinder service) {
-
-                //updateService = ((UpdateService.updateServiceConnection)service).getService();
-                Log.d("Binder", "Counting service connected");
-            }
-
-            public void onServiceDisconnected(ComponentName className) {
-
-                //updatingService = null;
-                Log.d("Binder", "Counting service disconnected");
-            }
-        };
     }
 }

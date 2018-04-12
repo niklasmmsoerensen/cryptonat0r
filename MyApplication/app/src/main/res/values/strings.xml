@@ -5,4 +5,6 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+    <string name="title_activity_trending">TrendingActivity</string>
+    <string name="AppName">Cryptonat0r</string>
 </resources>
