@@ -1,13 +1,17 @@
 package com.example.krillinat0r.myapplication;
 
+import android.app.AlertDialog;
 import android.content.ComponentName;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -18,7 +22,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +45,10 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
     private DrawerLayout drawer;
     private NavigationView navigationView;
 
+    //Add new Coin
+    FloatingActionButton AddNewCoin;
+    private AlertDialog.Builder builder;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,7 +56,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
 
         CurrencyList = findViewById(R.id.Currency_List);
 
-        //Init adapter
+        //Init adapter and setup connection
         adapter = new CurrencyListAdapter(getApplicationContext(), mCurrencyDataList);
         CurrencyList.setAdapter(adapter);
         setupConnectionToCountingService();
@@ -62,19 +72,44 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         mCurrencyDataList.add(data1);
         mCurrencyDataList.add(data2);
 
+        //Setup toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.Add_Coin_Btn);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(OverviewActivity.this, TrendingActivity.class);
-                startActivity(intent);
+        //Setup AlertDialog
+        builder = new AlertDialog.Builder(OverviewActivity.this);
+        builder.setTitle(getString(R.string.InsertCoinName));
 
-            }
+        //Setup AddNewCoin button
+        AddNewCoin = (FloatingActionButton) findViewById(R.id.add_Coin_Btn);
+        AddNewCoin.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View view) {
+
+                final EditText input = new EditText(OverviewActivity.this);
+                input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_CLASS_TEXT);
+                builder.setView(input);
+
+                // Set up the buttons
+                builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                CheckIfValidCoin coinDownloader = new CheckIfValidCoin();
+                                coinDownloader.execute(input.getText().toString());
+                                dialog.dismiss();
+                            }
+                        });
+                        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+
+                        builder.show();
+                    }
         });
 
+        //Setup drawer + navigationView
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -155,5 +190,32 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
                 Log.d("Binder", "Counting service disconnected");
             }
         };
+    }
+
+    public class CheckIfValidCoin extends AsyncTask<String, Void, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(String... strings) {
+            return AddCoinToOverview(strings[0]);
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            if(result)
+            {
+                Toast.makeText(OverviewActivity.this, getString(R.string.AddCoinSuccesful), Toast.LENGTH_SHORT).show();
+                /*if(UpdatingService != null)
+                    UpdatingService.UpdateList();*/
+            }
+            else
+            {
+                Toast.makeText(OverviewActivity.this, R.string.AddCoinFailed, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private boolean AddCoinToOverview(String coinName)
+    {
+        return true;
     }
 }

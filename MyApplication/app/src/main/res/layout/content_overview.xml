@@ -8,6 +8,20 @@
     tools:context="com.example.krillinat0r.myapplication.OverviewActivity"
     tools:showIn="@layout/app_bar_overview">
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/add_Coin_Btn"
+        android:layout_width="50dp"
+        android:layout_height="53dp"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:layout_marginBottom="16dp"
+        app:backgroundTint="@color/colorPrimaryDark"
+        app:elevation="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:srcCompat="@android:drawable/ic_input_add" />
+
     <ListView
         android:id="@+id/Currency_List"
         android:layout_width="368dp"

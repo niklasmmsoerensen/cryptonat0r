@@ -7,4 +7,7 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_trending">TrendingActivity</string>
     <string name="AppName">Cryptonat0r</string>
+    <string name="AddCoinSuccesful">Succesfully added new coin!</string>
+    <string name="AddCoinFailed">Coin cannot be found!</string>
+    <string name="InsertCoinName">Enter new coin name:</string>
 </resources>
