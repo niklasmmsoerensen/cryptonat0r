@@ -8,6 +8,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.List;
 
 /**
@@ -15,6 +17,8 @@ import java.util.List;
  */
 
 public class CurrencyListAdapter extends BaseAdapter {
+
+    private final String baseUrl = "https://www.cryptocompare.com";
 
     private Context mContext;
     private List<CurrencyData> mCurrencyDataList;
@@ -45,7 +49,7 @@ public class CurrencyListAdapter extends BaseAdapter {
         View v = View.inflate(mContext, R.layout.item_currency_list, null);
 
         TextView coinName = v.findViewById(R.id.Coin_Name);
-        coinName.setText(mCurrencyDataList.get(i).getCoinName()); //Set name
+        coinName.setText(mCurrencyDataList.get(i).getKey()); //Set name
 
         TextView price = v.findViewById(R.id.Coin_Price);
         price.setText("$" + String.valueOf(mCurrencyDataList.get(i).getCoinPrice()));
@@ -54,7 +58,7 @@ public class CurrencyListAdapter extends BaseAdapter {
         coinChange.setText(String.valueOf(mCurrencyDataList.get(i).getPercentChange()) + "%"); //Set coin value change
 
         ImageView coinIcon = v.findViewById(R.id.Coin_IMG);
-        coinIcon.setImageBitmap(mCurrencyDataList.get(i).getCoinIcon());
+        Picasso.get().load(baseUrl + mCurrencyDataList.get(i).getCoinIconUrl()).into(coinIcon);
 
         ImageView rateIcon = v.findViewById(R.id.Arrow_Rate_IMG);
         rateIcon.setImageBitmap(mCurrencyDataList.get(i).getCoinRate());

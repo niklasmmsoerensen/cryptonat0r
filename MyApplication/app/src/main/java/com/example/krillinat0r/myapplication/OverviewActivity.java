@@ -9,9 +9,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.text.InputType;
@@ -30,7 +32,12 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
+import com.google.gson.reflect.TypeToken;
+
 import java.lang.reflect.Array;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Currency;
 import java.util.HashMap;
@@ -39,7 +46,6 @@ import java.util.List;
 public class OverviewActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private final static String LOG = "OVERVIEW";
-    private final static String TEST = "TEST";
 
     private ListView CurrencyList;
     private CurrencyListAdapter adapter;
@@ -217,8 +223,6 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
                 Log.d(LOG, "onServiceConnected");
                 updatingService = ((UpdatingService.UpdatingServiceBinder)service).getService();
                 //populate UpdatingService currency list
-                updatingService.addCoin("ETH");
-                updatingService.addCoin("BTC");
                 //start fetching coinlist, takes ~5 seconds
                 updatingService.fetchCoinList();
                 Log.d("Binder", "Updating service connected");
@@ -245,6 +249,12 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
                 //subscribedCurrencies = updatingService.getJsonResponses();
                 subscribedCurrencies.clear();
                 subscribedCurrencies.addAll(updatingService.getSubscribedCurrencies());
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        adapter.notifyDataSetChanged();
+                    }
+                });
             }
             else {
                 //error occured

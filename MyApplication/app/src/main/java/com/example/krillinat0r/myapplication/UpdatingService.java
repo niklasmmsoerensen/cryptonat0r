@@ -2,9 +2,11 @@ package com.example.krillinat0r.myapplication;
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -14,7 +16,11 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,8 +33,13 @@ public class UpdatingService extends Service {
     public static final String EXTRA_REQUEST_RESULT = "UPDATING_SERVICE_RESULT";
     public static final int REQUEST_SUCCESS = 0;
     public static final int REQUEST_ERROR = 1;
+    public static final String SUBSCRIBED_CURRENCIES = "SubscribedCurrencies";
 
-    private String toCurrency = "USD";
+    private static final String fetchPricesBaseURL = "https://min-api.cryptocompare.com/data/pricemulti?fsyms=";
+    private static final String currencyPrefix = "&tsyms=";
+    private static final String fetchCoinListURL = "https://min-api.cryptocompare.com/data/all/coinlist";
+    private static final String toCurrency = "USD";
+
     private List<CurrencyData> subscribedCurrencies = new ArrayList<>();
     private List<String> jsonResponses = new ArrayList<>();
     private HashMap<String, CurrencyMapValue> currencyMap = new HashMap<>();
@@ -58,6 +69,22 @@ public class UpdatingService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(LOG, "UpdatingService onStartCommand");
+
+        //get sharedPreferences data
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String subscribedCurrenciesJson = preferences.getString(SUBSCRIBED_CURRENCIES, "");
+        if(subscribedCurrenciesJson != "") {
+            Gson gson = new Gson();
+            try{
+                Type type = new TypeToken<ArrayList<CurrencyData>>(){}.getType();
+                ArrayList<CurrencyData> sharedPrefSubs = gson.fromJson(subscribedCurrenciesJson, type);
+                subscribedCurrencies.clear();
+                subscribedCurrencies.addAll(sharedPrefSubs);
+            }
+            catch(JsonParseException e)   {
+                Log.d(LOG, "JSON ERROR: " + e.toString());
+            }
+        }
         fetchPrices();
         return super.onStartCommand(intent, flags, startId);
     }
@@ -68,7 +95,7 @@ public class UpdatingService extends Service {
             queue = Volley.newRequestQueue(this);
         }
 
-        apiRequest = "https://min-api.cryptocompare.com/data/pricemulti?fsyms=";
+        apiRequest = fetchPricesBaseURL;
         for(int i = 0; i < subscribedCurrencies.size(); i++) {
             if((i+1) != subscribedCurrencies.size()) {
                 apiRequest += subscribedCurrencies.get(i).getKey() + ",";
@@ -77,7 +104,7 @@ public class UpdatingService extends Service {
                 apiRequest += subscribedCurrencies.get(i).getKey();
             }
         }
-        apiRequest += "&tsyms=" + toCurrency;
+        apiRequest += currencyPrefix + toCurrency;
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, apiRequest,
                 new Response.Listener<String>() {
@@ -129,7 +156,7 @@ public class UpdatingService extends Service {
         if(queue == null) {
             queue = Volley.newRequestQueue(this);
         }
-        apiRequest = "https://min-api.cryptocompare.com/data/all/coinlist";
+        apiRequest = fetchCoinListURL;
         StringRequest stringRequest = new StringRequest(Request.Method.GET, apiRequest,
                 new Response.Listener<String>() {
                     @Override
@@ -160,14 +187,24 @@ public class UpdatingService extends Service {
 
     public boolean addCoin(String coin) {
         CurrencyMapValue mapValue = currencyMap.get(coin);
-        if(mapValue != null)
-        {
+        if(mapValue != null) {
+            for (int i = 0; i < subscribedCurrencies.size(); i++) {
+                if(subscribedCurrencies.get(i).getKey().equals(coin)) {
+                    return false;
+                }
+            }
             CurrencyData currency = new CurrencyData();
             currency.setKey(coin);
             currency.setCoinName(mapValue.getName());
             currency.setCoinIconUrl(mapValue.getImageUrl());
 
             subscribedCurrencies.add(currency);
+            //save subscribed currencies to shared preferences
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences.Editor editor = preferences.edit();
+            Gson gson = new Gson();
+            editor.putString(SUBSCRIBED_CURRENCIES, gson.toJson(subscribedCurrencies));
+            editor.commit();
             return true;
         }
         return false;
