@@ -32,6 +32,8 @@ import android.widget.Toast;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Currency;
+import java.util.HashMap;
 import java.util.List;
 
 public class OverviewActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -42,7 +44,6 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
     private ListView CurrencyList;
     private CurrencyListAdapter adapter;
     private IntentFilter filter;
-    private List<CurrencyData> mCurrencyDataList = new ArrayList<>();
 
     //for bound counting service
     private UpdatingService updatingService;
@@ -57,8 +58,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
     FloatingActionButton AddNewCoin;
     private AlertDialog.Builder builder;
     //private currency data
-    private List<String> coinPrices = new ArrayList<>();
-    private String coinList = "";
+    private List<CurrencyData> subscribedCurrencies = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +68,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         CurrencyList = findViewById(R.id.Currency_List);
 
         //Init adapter and setup connection
-        adapter = new CurrencyListAdapter(getApplicationContext(), mCurrencyDataList);
+        adapter = new CurrencyListAdapter(getApplicationContext(), subscribedCurrencies);
         CurrencyList.setAdapter(adapter);
 
         setupConnectionToUpdatingService();
@@ -81,17 +81,6 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
        //bind to service
         bindService(new Intent(OverviewActivity.this,
                 UpdatingService.class), updatingServiceConnection, Context.BIND_AUTO_CREATE);
-
-        CurrencyData data1 = new CurrencyData();
-        data1.set_coinName("ETH");
-        data1.set_coinPrice(1000);
-        data1.set_percentChange(5);
-        CurrencyData data2 = new CurrencyData();
-        data2.set_coinName("DOGE");
-        data2.set_coinPrice(0.1f);
-        data2.set_percentChange(4);
-        mCurrencyDataList.add(data1);
-        mCurrencyDataList.add(data2);
 
         //Setup toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -243,7 +232,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         };
     }
 
-    private BroadcastReceiver onUpdatingServiceResult = new BroadcastReceiver() {
+    private BroadcastReceiver onUpdatingServicePricesResult = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d(LOG, "Broadcast reveiced: PRICES");
@@ -253,7 +242,9 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
                 //success
                 Log.d(LOG, "Received OK from broadcast!");
                 //use bound service to receive data
-                coinPrices = updatingService.getJsonResponses();
+                //subscribedCurrencies = updatingService.getJsonResponses();
+                subscribedCurrencies.clear();
+                subscribedCurrencies.addAll(updatingService.getSubscribedCurrencies());
             }
             else {
                 //error occured
@@ -271,7 +262,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
                 //success
                 Log.d(LOG, "Coinlist OK!");
                 //Let's get the coinlist!
-                coinList = updatingService.getCoinList();
+                //wait lets not haha
             }
             else {
                 //error

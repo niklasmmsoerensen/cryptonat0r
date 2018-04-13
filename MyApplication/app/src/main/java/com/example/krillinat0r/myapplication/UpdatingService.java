@@ -2,13 +2,11 @@ package com.example.krillinat0r.myapplication;
 
 import android.app.Service;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -18,6 +16,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class UpdatingService extends Service {
@@ -30,9 +29,9 @@ public class UpdatingService extends Service {
     public static final int REQUEST_ERROR = 1;
 
     private String toCurrency = "USD";
-    private List<String> fromCurrencies = new ArrayList<>();
+    private List<CurrencyData> subscribedCurrencies = new ArrayList<>();
     private List<String> jsonResponses = new ArrayList<>();
-    private String coinListJSON = "";
+    private HashMap<String, CurrencyMapValue> currencyMap = new HashMap<>();
 
     RequestQueue queue;
 
@@ -69,33 +68,51 @@ public class UpdatingService extends Service {
             queue = Volley.newRequestQueue(this);
         }
 
-        for(int i = 0; i < fromCurrencies.size(); i++) {
-            apiRequest = "https://min-api.cryptocompare.com/data/price?fsym="+ fromCurrencies.get(i) +"&tsyms="+ toCurrency;
-            StringRequest stringRequest = new StringRequest(Request.Method.GET, apiRequest,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            //set private list of coins in here and broadcast
-                            //that request was OK/FAIL
-                            //bound service should be able to access list by using GET method
-                            jsonResponses.add(response);
-                            sendResult(REQUEST_SUCCESS, BROADCAST_UPDATING_SERVICE_PRICES_RESULT);
-                        }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            sendResult(REQUEST_ERROR, BROADCAST_UPDATING_SERVICE_PRICES_RESULT);
-                        }
-                    });
-            queue.add(stringRequest);
+        apiRequest = "https://min-api.cryptocompare.com/data/pricemulti?fsyms=";
+        for(int i = 0; i < subscribedCurrencies.size(); i++) {
+            if((i+1) != subscribedCurrencies.size()) {
+                apiRequest += subscribedCurrencies.get(i).getKey() + ",";
+            }
+            else {
+                apiRequest += subscribedCurrencies.get(i).getKey();
+            }
         }
+        apiRequest += "&tsyms=" + toCurrency;
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, apiRequest,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        //set private list of coins in here and broadcast
+                        //that request was OK/FAIL
+                        //bound service should be able to access list by using GET method
+                        List<CurrencyPriceData> updatedPrices = CurrencyJsonParser.parseCurrencyPrice(response);
+
+                        for(int i = 0; i < updatedPrices.size(); i++)
+                        {
+                            for(int j = 0; j < subscribedCurrencies.size(); j++)
+                            {
+                                if(updatedPrices.get(i).getKey().equals(subscribedCurrencies.get(j).getKey()))
+                                    subscribedCurrencies.get(j).setCoinPrice(updatedPrices.get(i).getPrice());
+                            }
+                        }
+                        sendResult(REQUEST_SUCCESS, BROADCAST_UPDATING_SERVICE_PRICES_RESULT);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        sendResult(REQUEST_ERROR, BROADCAST_UPDATING_SERVICE_PRICES_RESULT);
+                    }
+                });
+        queue.add(stringRequest);
+
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                     fetchPrices();
             }
-        }, 2000);
+        }, 10000);
     }
 
     private void sendResult(int result, String type) {
@@ -120,7 +137,7 @@ public class UpdatingService extends Service {
                         //set private list of coins in here and broadcast
                         //that request was OK/FAIL
                         //bound service should be able to access list by using GET method
-                        coinListJSON = response;
+                        currencyMap = CurrencyJsonParser.parseCurrencyHashmapJson(response);
                         sendResult(REQUEST_SUCCESS, BROADCAST_UPDATING_SERVICE_COINLIST_RESULT);
                     }
                 },
@@ -137,13 +154,22 @@ public class UpdatingService extends Service {
         return jsonResponses;
     }
 
-    public String getCoinList() {
-        return coinListJSON;
+    public List<CurrencyData> getSubscribedCurrencies() {
+        return subscribedCurrencies;
     }
 
     public boolean addCoin(String coin) {
-        //should check if coin exists and not add it if it does
-        fromCurrencies.add(coin);
-        return true;
+        CurrencyMapValue mapValue = currencyMap.get(coin);
+        if(mapValue != null)
+        {
+            CurrencyData currency = new CurrencyData();
+            currency.setKey(coin);
+            currency.setCoinName(mapValue.getName());
+            currency.setCoinIconUrl(mapValue.getImageUrl());
+
+            subscribedCurrencies.add(currency);
+            return true;
+        }
+        return false;
     }
 }

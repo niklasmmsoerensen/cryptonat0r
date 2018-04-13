@@ -45,19 +45,19 @@ public class CurrencyListAdapter extends BaseAdapter {
         View v = View.inflate(mContext, R.layout.item_currency_list, null);
 
         TextView coinName = v.findViewById(R.id.Coin_Name);
-        coinName.setText(mCurrencyDataList.get(i).get_coinName()); //Set name
+        coinName.setText(mCurrencyDataList.get(i).getCoinName()); //Set name
 
         TextView price = v.findViewById(R.id.Coin_Price);
-        price.setText("$" + String.valueOf(mCurrencyDataList.get(i).get_coinPrice()));
+        price.setText("$" + String.valueOf(mCurrencyDataList.get(i).getCoinPrice()));
 
         TextView coinChange = v.findViewById(R.id.Percent_Change);
-        coinChange.setText(String.valueOf(mCurrencyDataList.get(i).get_percentChange()) + "%"); //Set coin value change
+        coinChange.setText(String.valueOf(mCurrencyDataList.get(i).getPercentChange()) + "%"); //Set coin value change
 
         ImageView coinIcon = v.findViewById(R.id.Coin_IMG);
-        coinIcon.setImageBitmap(mCurrencyDataList.get(i).get_coinIcon());
+        coinIcon.setImageBitmap(mCurrencyDataList.get(i).getCoinIcon());
 
         ImageView rateIcon = v.findViewById(R.id.Arrow_Rate_IMG);
-        rateIcon.setImageBitmap(mCurrencyDataList.get(i).get_coinRate());
+        rateIcon.setImageBitmap(mCurrencyDataList.get(i).getCoinRate());
 
         return v;
     }
