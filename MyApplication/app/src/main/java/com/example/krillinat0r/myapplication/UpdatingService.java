@@ -23,14 +23,16 @@ import java.util.List;
 public class UpdatingService extends Service {
 
     private static final String LOG = "Updating Service";
-    public static final String BROADCAST_UPDATING_SERVICE_RESULT = "com.example.krillinat0r.myapplication.BROADCAST_UPDATING_SERVICE_RESULT";
-    public static final String EXTRA_COINPRICE_RESULT = "UPDATING_SERVICE_RESULT";
-    public static final int COIN_REQUEST_SUCCESS = 0;
-    public static final int COIN_REQUEST_ERROR = 1;
+    public static final String BROADCAST_UPDATING_SERVICE_PRICES_RESULT = "com.example.krillinat0r.myapplication.BROADCAST_UPDATING_SERVICE_PRICES_RESULT";
+    public static final String BROADCAST_UPDATING_SERVICE_COINLIST_RESULT = "com.example.krillinat0r.myapplication.BROADCAST_UPDATING_SERVICE_COINLIST_RESULT";
+    public static final String EXTRA_REQUEST_RESULT = "UPDATING_SERVICE_RESULT";
+    public static final int REQUEST_SUCCESS = 0;
+    public static final int REQUEST_ERROR = 1;
 
     private String toCurrency = "USD";
     private List<String> fromCurrencies = new ArrayList<>();
     private List<String> jsonResponses = new ArrayList<>();
+    private String coinListJSON = "";
 
     RequestQueue queue;
 
@@ -57,11 +59,11 @@ public class UpdatingService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(LOG, "UpdatingService onStartCommand");
-        fetchData();
+        fetchPrices();
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private void fetchData() {
+    private void fetchPrices() {
         String apiRequest = "";
         if(queue == null) {
             queue = Volley.newRequestQueue(this);
@@ -77,13 +79,13 @@ public class UpdatingService extends Service {
                             //that request was OK/FAIL
                             //bound service should be able to access list by using GET method
                             jsonResponses.add(response);
-                            sendResult(0);
+                            sendResult(REQUEST_SUCCESS, BROADCAST_UPDATING_SERVICE_PRICES_RESULT);
                         }
                     },
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            sendResult(1);
+                            sendResult(REQUEST_ERROR, BROADCAST_UPDATING_SERVICE_PRICES_RESULT);
                         }
                     });
             queue.add(stringRequest);
@@ -91,27 +93,56 @@ public class UpdatingService extends Service {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                    fetchData();
+                    fetchPrices();
             }
         }, 2000);
     }
 
-    private void sendResult(int result) {
+    private void sendResult(int result, String type) {
         Intent broadcast = new Intent();
         //so we know which kind of update this is
-        broadcast.setAction(BROADCAST_UPDATING_SERVICE_RESULT);
-        broadcast.putExtra(EXTRA_COINPRICE_RESULT, result);
-        //should probably just send that request was OK instead of all the data
+        broadcast.setAction(type);
+        broadcast.putExtra(EXTRA_REQUEST_RESULT, result);
         Log.d(LOG, "Broadcasting result: " + result);
         LocalBroadcastManager.getInstance(this).sendBroadcast(broadcast);
+    }
+
+    public void fetchCoinList() {
+        String apiRequest = "";
+        if(queue == null) {
+            queue = Volley.newRequestQueue(this);
+        }
+        apiRequest = "https://min-api.cryptocompare.com/data/all/coinlist";
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, apiRequest,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        //set private list of coins in here and broadcast
+                        //that request was OK/FAIL
+                        //bound service should be able to access list by using GET method
+                        coinListJSON = response;
+                        sendResult(REQUEST_SUCCESS, BROADCAST_UPDATING_SERVICE_COINLIST_RESULT);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        sendResult(REQUEST_ERROR, BROADCAST_UPDATING_SERVICE_COINLIST_RESULT);
+                    }
+                });
+        queue.add(stringRequest);
     }
 
     public List<String> getJsonResponses() {
         return jsonResponses;
     }
 
+    public String getCoinList() {
+        return coinListJSON;
+    }
+
     public boolean addCoin(String coin) {
-        //should check if coin exists and not add it if it does return true
+        //should check if coin exists and not add it if it does
         fromCurrencies.add(coin);
         return true;
     }
