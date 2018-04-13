@@ -31,8 +31,8 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
     private List<CurrencyData> mCurrencyDataList = new ArrayList<>();
 
     //for bound counting service
-    //private updateService UpdateService;
-    private ServiceConnection updateServiceConnection;
+    private UpdatingService updatingService;
+    private ServiceConnection updatingServiceConnection;
     private boolean bound = false;
 
     //Drawer / navigationview
@@ -47,9 +47,20 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         CurrencyList = findViewById(R.id.Currency_List);
 
         //Init adapter
-       // adapter = new CurrencyListAdapter(getApplicationContext(), mCurrencyDataList);
-       // CurrencyList.setAdapter(adapter);
-       // setupConnectionToCountingService();
+        adapter = new CurrencyListAdapter(getApplicationContext(), mCurrencyDataList);
+        CurrencyList.setAdapter(adapter);
+        setupConnectionToCountingService();
+
+        CurrencyData data1 = new CurrencyData();
+        data1.set_coinName("ETH");
+        data1.set_coinPrice(1000);
+        data1.set_percentChange(5);
+        CurrencyData data2 = new CurrencyData();
+        data2.set_coinName("DOGE");
+        data2.set_coinPrice(0.1f);
+        data2.set_percentChange(4);
+        mCurrencyDataList.add(data1);
+        mCurrencyDataList.add(data2);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -131,10 +142,10 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
     }
 
     private void setupConnectionToCountingService(){
-        updateServiceConnection = new ServiceConnection() {
+        updatingServiceConnection = new ServiceConnection() {
             public void onServiceConnected(ComponentName className, IBinder service) {
 
-                //updateService = ((UpdateService.updateServiceConnection)service).getService();
+                updatingService = ((UpdatingService.UpdatingServiceBinder)service).getService();
                 Log.d("Binder", "Counting service connected");
             }
 
