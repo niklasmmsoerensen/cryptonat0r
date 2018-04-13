@@ -37,6 +37,7 @@ import java.util.List;
 public class OverviewActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private final static String LOG = "OVERVIEW";
+    private final static String TEST = "TEST";
 
     private ListView CurrencyList;
     private CurrencyListAdapter adapter;
