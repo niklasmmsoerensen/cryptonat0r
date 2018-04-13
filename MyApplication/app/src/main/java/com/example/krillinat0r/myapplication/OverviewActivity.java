@@ -58,6 +58,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
     private AlertDialog.Builder builder;
     //private currency data
     private List<String> coinPrices = new ArrayList<>();
+    private String coinList = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,17 +146,20 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
     {
         navigationView.getMenu().getItem(0).setChecked(true);
         IntentFilter filter = new IntentFilter();
-        filter.addAction(UpdatingService.BROADCAST_UPDATING_SERVICE_RESULT);
+        filter.addAction(UpdatingService.BROADCAST_UPDATING_SERVICE_PRICES_RESULT);
+        LocalBroadcastManager.getInstance(this).registerReceiver(onUpdatingServicePricesResult, filter);
 
-        //can use registerReceiver(...)
-        //but using local broadcasts for this service:
-        LocalBroadcastManager.getInstance(this).registerReceiver(onUpdatingServiceResult, filter);
+        filter = new IntentFilter();
+        filter.addAction(UpdatingService.BROADCAST_UPDATING_SERVICE_COINLIST_RESULT);
+        LocalBroadcastManager.getInstance(this).registerReceiver(onUpdatingServiceCoinListResult, filter);
+
         super.onStart();
     }
 
     @Override
     public void onStop() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(onUpdatingServiceResult);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(onUpdatingServiceCoinListResult);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(onUpdatingServicePricesResult);
         super.onStop();
     }
 
@@ -216,6 +220,8 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
                 //populate UpdatingService currency list
                 updatingService.addCoin("ETH");
                 updatingService.addCoin("BTC");
+                //start fetching coinlist, takes ~5 seconds
+                updatingService.fetchCoinList();
                 Log.d("Binder", "Updating service connected");
             }
 
@@ -254,27 +260,40 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         return true;
     }
     
-    private BroadcastReceiver onUpdatingServiceResult = new BroadcastReceiver() {
+    private BroadcastReceiver onUpdatingServicePricesResult = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(LOG, "Broadcast reveiced from bg service");
-            int result = intent.getIntExtra(UpdatingService.EXTRA_COINPRICE_RESULT, 1);
+            Log.d(LOG, "Broadcast reveiced: PRICES");
+            int result = intent.getIntExtra(UpdatingService.EXTRA_REQUEST_RESULT, 1);
 
-            handleUpdatingServiceResult(result);
+            if(result == 0) {
+                //success
+                Log.d(LOG, "Received OK from broadcast!");
+                //use bound service to receive data
+                coinPrices = updatingService.getJsonResponses();
+            }
+            else {
+                //error occured
+                Log.d(LOG, "Received ERROR from broadcast!");
+            }
         }
     };
 
-    private void handleUpdatingServiceResult(int result) {
-        if(result == 0) {
-            //success
-            Log.d(LOG, "Received OK from broadcast!");
-            //use bound service to receive data
-            coinPrices = updatingService.getJsonResponses();
-
+    private BroadcastReceiver onUpdatingServiceCoinListResult = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(LOG, "Broadcast received: COINLIST");
+            int result = intent.getIntExtra(UpdatingService.EXTRA_REQUEST_RESULT, 1);
+            if(result == 0) {
+                //success
+                Log.d(LOG, "Coinlist OK!");
+                //Let's get the coinlist!
+                coinList = updatingService.getCoinList();
+            }
+            else {
+                //error
+                Log.d(LOG, "Coinlist ERROR!");
+            }
         }
-        else {
-            //error occured
-            Log.d(LOG, "Received ERROR from broadcast!");
-        }
-    }
+    };
 }
