@@ -18,6 +18,7 @@ public class CurrencyData implements Parcelable{
     private float _percentChange;
     private float _coinPrice;
     private Bitmap _coinIcon;
+    private String _coinIconUrl;
     private Bitmap _coinRate;
 
     private static final String NAME = "NAME";
@@ -63,6 +64,14 @@ public class CurrencyData implements Parcelable{
     public float get_coinPrice() {return _coinPrice;}
 
     public void set_coinPrice(float _coinPrice) {this._coinPrice = _coinPrice;}
+
+    public String get_coinIconUrl() {
+        return _coinIconUrl;
+    }
+
+    public void set_coinIconUrl(String _coinIconUrl) {
+        this._coinIconUrl = _coinIconUrl;
+    }
 
     public static final Creator<CurrencyData> CREATOR = new Creator<CurrencyData>() {
         @Override

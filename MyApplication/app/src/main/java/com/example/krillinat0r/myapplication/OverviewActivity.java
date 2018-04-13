@@ -113,8 +113,18 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
                 builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                CheckIfValidCoin coinDownloader = new CheckIfValidCoin();
-                                coinDownloader.execute(input.getText().toString());
+                                if(updatingService != null && updatingServiceConnection != null)
+                                {
+                                    if(updatingService.addCoin(input.getText().toString()))
+                                    {
+                                        Toast.makeText(OverviewActivity.this, getString(R.string.AddCoinSuccesful),Toast.LENGTH_SHORT).show();
+                                        //updatingService.UpdateList();
+                                    }
+                                    else
+                                    {
+                                        Toast.makeText(OverviewActivity.this, getString(R.string.AddCoinFailed),Toast.LENGTH_SHORT).show();
+                                    }
+                                }
                                 dialog.dismiss();
                             }
                         });
@@ -227,33 +237,6 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         };
     }
 
-    public class CheckIfValidCoin extends AsyncTask<String, Void, Boolean> {
-
-        @Override
-        protected Boolean doInBackground(String... strings) {
-            return AddCoinToOverview(strings[0]);
-        }
-
-        @Override
-        protected void onPostExecute(Boolean result) {
-            if(result)
-            {
-                Toast.makeText(OverviewActivity.this, getString(R.string.AddCoinSuccesful), Toast.LENGTH_SHORT).show();
-                /*if(UpdatingService != null)
-                    UpdatingService.UpdateList();*/
-            }
-            else
-            {
-                Toast.makeText(OverviewActivity.this, R.string.AddCoinFailed, Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-    private boolean AddCoinToOverview(String coinName)
-    {
-        return true;
-    }
-    
     private BroadcastReceiver onUpdatingServiceResult = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {

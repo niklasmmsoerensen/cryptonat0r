@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -109,8 +110,9 @@ public class UpdatingService extends Service {
         return jsonResponses;
     }
 
-    public void addCoin(String coin) {
-        //should check if coin exists and not add it if it does
+    public boolean addCoin(String coin) {
+        //should check if coin exists and not add it if it does return true
         fromCurrencies.add(coin);
+        return true;
     }
 }
