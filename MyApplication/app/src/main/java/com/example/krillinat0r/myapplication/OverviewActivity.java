@@ -1,6 +1,8 @@
 package com.example.krillinat0r.myapplication;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
@@ -8,6 +10,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -20,10 +23,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
 public class OverviewActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+
+    private final static String LOG = "OVERVIEW";
 
     private ListView CurrencyList;
     private CurrencyListAdapter adapter;
@@ -38,6 +44,9 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
     //Drawer / navigationview
     private DrawerLayout drawer;
     private NavigationView navigationView;
+
+    //private currency data
+    private List<String> coinPrices = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,10 +71,10 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         mCurrencyDataList.add(data1);
         mCurrencyDataList.add(data2);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.Add_Coin_Btn);
+        FloatingActionButton fab = findViewById(R.id.Add_Coin_Btn);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -75,26 +84,40 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
             }
         });
 
-        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        //populate UpdatingService currency list
+        updatingService.addCoin("ETH");
     }
 
     @Override
     public void onStart()
     {
         navigationView.getMenu().getItem(0).setChecked(true);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(UpdatingService.BROADCAST_UPDATING_SERVICE_RESULT);
+
+        //can use registerReceiver(...)
+        //but using local broadcasts for this service:
+        LocalBroadcastManager.getInstance(this).registerReceiver(onUpdatingServiceResult, filter);
         super.onStart();
     }
 
     @Override
+    public void onStop() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(onUpdatingServiceResult);
+    }
+
+    @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -136,7 +159,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
             startActivity(startTrendingActivity);
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -146,14 +169,37 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
             public void onServiceConnected(ComponentName className, IBinder service) {
 
                 updatingService = ((UpdatingService.UpdatingServiceBinder)service).getService();
-                Log.d("Binder", "Counting service connected");
+                Log.d("Binder", "Updating service connected");
             }
 
             public void onServiceDisconnected(ComponentName className) {
 
                 //updatingService = null;
-                Log.d("Binder", "Counting service disconnected");
+                Log.d("Binder", "Updating service disconnected");
             }
         };
+    }
+
+    private BroadcastReceiver onUpdatingServiceResult = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(LOG, "Broadcast reveiced from bg service");
+            int result = intent.getIntExtra(UpdatingService.EXTRA_COINPRICE_RESULT, 1);
+
+            handleUpdatingServiceResult(result);
+        }
+    };
+
+    private void handleUpdatingServiceResult(int result) {
+        if(result == 0) {
+            //success
+            Log.d(LOG, "Received OK from broadcast!");
+            //use bound service to receive data
+            coinPrices = updatingService.getJsonResponses();
+        }
+        else {
+            //error occured
+            Log.d(LOG, "Received ERROR from broadcast!");
+        }
     }
 }

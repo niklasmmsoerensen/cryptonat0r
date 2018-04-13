@@ -15,11 +15,20 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class UpdatingService extends Service {
 
     private static final String LOG = "Updating Service";
     public static final String BROADCAST_UPDATING_SERVICE_RESULT = "com.example.krillinat0r.myapplication.BROADCAST_UPDATING_SERVICE_RESULT";
-    public static final String EXTRA_COINLIST_RESULT = "UPDATING_SERVICE_RESULT";
+    public static final String EXTRA_COINPRICE_RESULT = "UPDATING_SERVICE_RESULT";
+    public static final int COIN_REQUEST_SUCCESS = 0;
+    public static final int COIN_REQUEST_ERROR = 1;
+
+    private String toCurrency = "USD";
+    private List<String> fromCurrencies = new ArrayList<>();
+    private List<String> jsonResponses = new ArrayList<>();
 
     RequestQueue queue;
 
@@ -50,38 +59,50 @@ public class UpdatingService extends Service {
     }
 
     private void fetchData() {
+        String apiRequest = "";
         if(queue == null) {
             queue = Volley.newRequestQueue(this);
         }
-        String ApiRequest = "https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD,EUR";
 
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, ApiRequest,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        //set private list of coins in here and broadcast
-                        //that request was OK/FAIL
-                        //bound service should be able to access list by using GET method
-                        sendResult(response);
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-
-                    }
-                });
-        queue.add(stringRequest);
+        for(int i = 0; i < fromCurrencies.size(); i++) {
+            apiRequest = "https://min-api.cryptocompare.com/data/price?fsym="+ fromCurrencies.get(i) +"&tsyms="+ toCurrency;
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, apiRequest,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            //set private list of coins in here and broadcast
+                            //that request was OK/FAIL
+                            //bound service should be able to access list by using GET method
+                            jsonResponses.add(response);
+                            sendResult(0);
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            sendResult(1);
+                        }
+                    });
+            queue.add(stringRequest);
+        }
     }
 
-    private void sendResult(String result) {
+    private void sendResult(int result) {
         Intent broadcast = new Intent();
         //so we know which kind of update this is
         broadcast.setAction(BROADCAST_UPDATING_SERVICE_RESULT);
-        broadcast.putExtra(EXTRA_COINLIST_RESULT, result);
+        broadcast.putExtra(EXTRA_COINPRICE_RESULT, result);
         //should probably just send that request was OK instead of all the data
         Log.d(LOG, "Broadcasting result: " + result);
         LocalBroadcastManager.getInstance(this).sendBroadcast(broadcast);
     }
 
+    public List<String> getJsonResponses() {
+        return jsonResponses;
+    }
+
+    public void addCoin(String coin) {
+        //should check if coin exists and not add it if it does
+        fromCurrencies.add(coin);
+    }
 }
