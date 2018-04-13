@@ -68,7 +68,17 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         //Init adapter and setup connection
         adapter = new CurrencyListAdapter(getApplicationContext(), mCurrencyDataList);
         CurrencyList.setAdapter(adapter);
-        setupConnectionToCountingService();
+
+        setupConnectionToUpdatingService();
+
+        //start and setup connection to service
+        Log.d(LOG, "Starting service");
+        Intent startService = new Intent(OverviewActivity.this, UpdatingService.class);
+        startService(startService);
+
+       //bind to service
+        bindService(new Intent(OverviewActivity.this,
+                UpdatingService.class), updatingServiceConnection, Context.BIND_AUTO_CREATE);
 
         CurrencyData data1 = new CurrencyData();
         data1.set_coinName("ETH");
@@ -127,9 +137,6 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
 
         navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        //populate UpdatingService currency list
-        updatingService.addCoin("ETH");
     }
 
     @Override
@@ -148,6 +155,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
     @Override
     public void onStop() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(onUpdatingServiceResult);
+        super.onStop();
     }
 
     @Override
@@ -199,11 +207,14 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         return true;
     }
 
-    private void setupConnectionToCountingService(){
+    private void setupConnectionToUpdatingService(){
         updatingServiceConnection = new ServiceConnection() {
             public void onServiceConnected(ComponentName className, IBinder service) {
-
+                Log.d(LOG, "onServiceConnected");
                 updatingService = ((UpdatingService.UpdatingServiceBinder)service).getService();
+                //populate UpdatingService currency list
+                updatingService.addCoin("ETH");
+                updatingService.addCoin("BTC");
                 Log.d("Binder", "Updating service connected");
             }
 
@@ -258,6 +269,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
             Log.d(LOG, "Received OK from broadcast!");
             //use bound service to receive data
             coinPrices = updatingService.getJsonResponses();
+
         }
         else {
             //error occured

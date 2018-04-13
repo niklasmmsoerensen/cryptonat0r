@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -54,8 +55,9 @@ public class UpdatingService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d(LOG, "UpdatingService onStartCommand");
         fetchData();
-        return START_STICKY;
+        return super.onStartCommand(intent, flags, startId);
     }
 
     private void fetchData() {
@@ -85,6 +87,12 @@ public class UpdatingService extends Service {
                     });
             queue.add(stringRequest);
         }
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                    fetchData();
+            }
+        }, 2000);
     }
 
     private void sendResult(int result) {
