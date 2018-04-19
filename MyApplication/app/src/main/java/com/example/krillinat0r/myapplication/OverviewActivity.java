@@ -111,7 +111,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
                             public void onClick(DialogInterface dialog, int which) {
                                 if(updatingService != null && updatingServiceConnection != null)
                                 {
-                                    if(updatingService.addCoin(input.getText().toString()))
+                                    if(updatingService.addCoin(input.getText().toString().toUpperCase()))
                                     {
                                         Toast.makeText(OverviewActivity.this, getString(R.string.AddCoinSuccesful),Toast.LENGTH_SHORT).show();
                                         //updatingService.UpdateList();
