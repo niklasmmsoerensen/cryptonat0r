@@ -99,7 +99,7 @@ public class GraphActivity extends AppCompatActivity {
     public void onStart()
     {
         IntentFilter filter = new IntentFilter();
-        filter.addAction(UpdatingService.BROADCAST_UPDATING_SERVICE_COINHISTORY_RESULT);
+        filter.addAction(UpdatingService.BROADCAST_UPDATING_SERVICE_HISTORICALDATA_RESULT);
         LocalBroadcastManager.getInstance(this).registerReceiver(onUpdatingServiceCoinHistoryResult, filter);
 
         super.onStart();
