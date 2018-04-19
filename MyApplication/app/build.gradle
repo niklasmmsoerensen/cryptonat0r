@@ -30,4 +30,5 @@ dependencies {
     compile 'com.google.code.gson:gson:2.8.2'
     implementation 'com.squareup.picasso:picasso:2.71828'
     compile 'com.google.code.gson:gson:2.8.2'
+    compile 'com.jjoe64:graphview:4.0.0'
 }

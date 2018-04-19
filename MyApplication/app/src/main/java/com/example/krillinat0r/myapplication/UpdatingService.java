@@ -41,6 +41,7 @@ public class UpdatingService extends Service {
     private static final String currencyPrefix = "&tsyms=";
     private static final String fetchCoinListURL = "https://min-api.cryptocompare.com/data/all/coinlist";
     private static final String toCurrency = "USD";
+    private static final String fetchHistoricalDataMinuteURL = "https://min-api.cryptocompare.com/data/histominute?fsym=";
     private static final String fetchHistoricalDataHourURL = "https://min-api.cryptocompare.com/data/histohour?fsym=";
     private static final String fetchHistoricalDataDayURL = "https://min-api.cryptocompare.com/data/histoday?fsym=";
 
@@ -50,10 +51,6 @@ public class UpdatingService extends Service {
     private List<CurrencyHistoricalDataPoints> currencyHistoricalDataPointsList = new ArrayList<>();
 
     RequestQueue queue;
-
-    public enum dataType {
-        HOUR, DAY, MONTH, YEAR
-    }
 
     public class UpdatingServiceBinder extends Binder {
         UpdatingService getService() { return UpdatingService.this; }
@@ -194,6 +191,17 @@ public class UpdatingService extends Service {
         return subscribedCurrencies;
     }
 
+    public List<CurrencyHistoricalDataPoints> getCurrencyHistoricalDataPointsList() { return currencyHistoricalDataPointsList; }
+
+    public CurrencyHistoricalDataPoints getCurrencyHistoricalDataPoints(String currency) {
+        for (int i = 0; i < currencyHistoricalDataPointsList.size(); i++) {
+            if(currencyHistoricalDataPointsList.get(i).currency.equals(currency)) {
+                return currencyHistoricalDataPointsList.get(i);
+            }
+        }
+        return null;
+    }
+
     public boolean addCoin(String coin) {
         CurrencyMapValue mapValue = currencyMap.get(coin);
         if(mapValue != null) {
@@ -219,10 +227,30 @@ public class UpdatingService extends Service {
         return false;
     }
 
-    public void fetchHistoricalData(String coin, dataType type, int limit) {
-        //setup api request
-        String apiRequest = type == dataType.HOUR ? fetchHistoricalDataHourURL : fetchHistoricalDataDayURL;
+    public void fetchHistoricalData(String coin, GraphActivity.GraphTime type) {
+        //region setup api request
+        String apiRequest = "";
+        int limit = 0;
+        switch(type) {
+            case Hour:
+                apiRequest = fetchHistoricalDataMinuteURL;
+                limit = 60;
+            break;
+            case Day:
+                apiRequest = fetchHistoricalDataHourURL;
+                limit = 24;
+                break;
+            case Week:
+                apiRequest = fetchHistoricalDataDayURL;
+                limit = 7;
+                break;
+            case Month:
+                apiRequest = fetchHistoricalDataDayURL;
+                limit = 30;
+                break;
+        }
         apiRequest += coin + "&tsym=" + toCurrency + "&limit=" + String.valueOf(limit);
+        //endregion
 
         if(queue == null) {
             queue = Volley.newRequestQueue(this);
