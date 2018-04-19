@@ -37,11 +37,11 @@ public class GraphActivity extends AppCompatActivity {
     private ServiceConnection updatingServiceConnection;
     private boolean bound = false;
 
-    private RadioButton HourBtn;
-    private RadioButton DayBtn;
-    private RadioButton WeekBtn;
-    private RadioButton MonthBtn;
+    private GraphView graph;
     private RadioGroup TimeScaleGroup;
+    private GraphTime currentTime;
+
+    private CurrencyHistoricalDataPoints currencyHistory;
 
     public enum GraphTime
     {
@@ -58,6 +58,8 @@ public class GraphActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_graph);
 
+        currentTime = GraphTime.Week;
+
         currentCurrency = (CurrencyData) getIntent().getParcelableExtra(CURRENCY);
 
         setupConnectionToUpdatingService();
@@ -71,11 +73,26 @@ public class GraphActivity extends AppCompatActivity {
         {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                // checkedId is the RadioButton selected
+                switch(checkedId)
+                {
+                    case 0:
+                        currentTime = GraphTime.Hour;
+                        break;
+                    case 1:
+                        currentTime = GraphTime.Day;
+                        break;
+                    case 2:
+                        currentTime = GraphTime.Week;
+                        break;
+                    case 3:
+                        currentTime = GraphTime.Month;
+                        break;
+                }
+                //Call updating service fetch
             }
         });
 
-        GraphView graph = (GraphView) findViewById(R.id.graph);
+        graph = (GraphView) findViewById(R.id.graph);
         graph.setTitle(currentCurrency.getCoinName());
 
         Date date = new Date();
@@ -99,7 +116,7 @@ public class GraphActivity extends AppCompatActivity {
     public void onStart()
     {
         IntentFilter filter = new IntentFilter();
-        filter.addAction(UpdatingService.BROADCAST_UPDATING_SERVICE_COINHISTORY_RESULT);
+        filter.addAction(UpdatingService.BROADCAST_UPDATING_SERVICE_HISTORICALDATA_RESULT);
         LocalBroadcastManager.getInstance(this).registerReceiver(onUpdatingServiceCoinHistoryResult, filter);
 
         super.onStart();
@@ -111,7 +128,6 @@ public class GraphActivity extends AppCompatActivity {
                 Log.d(LOG, "onServiceConnected");
                 updatingService = ((UpdatingService.UpdatingServiceBinder)service).getService();
 
-                //updatingService.GetGraph();
                 Log.d("Binder", "Updating service connected");
             }
 
@@ -140,9 +156,22 @@ public class GraphActivity extends AppCompatActivity {
         }
     };
 
-    private void SetGraphToCoinHistoryData()
-    {
+    private void SetGraphToCoinHistoryData() {
+        DataPoint[] graphPoints = new DataPoint[]{};
 
+        for (int i = 0; i < currencyHistory.dataPoints.size(); i++) {
+            graphPoints[i] = new DataPoint(currencyHistory.dataPoints.get(i).timestamp, currencyHistory.dataPoints.get(i).getClose());
+        }
+
+
+
+        LineGraphSeries<DataPoint> series = new LineGraphSeries<>(new DataPoint[]{
+                new DataPoint(0, 1),
+                new DataPoint(1, 5),
+                new DataPoint(2, 3),
+                new DataPoint(3, 2),
+                new DataPoint(4, 6)
+        });
+        graph.addSeries(series);
     }
-
 }
