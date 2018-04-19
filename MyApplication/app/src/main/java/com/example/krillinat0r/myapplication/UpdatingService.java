@@ -22,6 +22,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class UpdatingService extends Service {
     private static final String LOG = "Updating Service";
     public static final String BROADCAST_UPDATING_SERVICE_PRICES_RESULT = "com.example.krillinat0r.myapplication.BROADCAST_UPDATING_SERVICE_PRICES_RESULT";
     public static final String BROADCAST_UPDATING_SERVICE_COINLIST_RESULT = "com.example.krillinat0r.myapplication.BROADCAST_UPDATING_SERVICE_COINLIST_RESULT";
-    public static final String BROADCAST_UPDATING_SERVICE_COINHISTORY_RESULT = "com.example.krillinat0r.myapplication.BROADCAST_UPDATING_SERVICE_COINHISTORY_RESULT";
+    public static final String BROADCAST_UPDATING_SERVICE_HISTORICALDATA_RESULT = "com.example.krillinat0r.myapplication.BROADCAST_UPDATING_SERVICE_HISTORICALDATA_RESULT";
     public static final String EXTRA_REQUEST_RESULT = "UPDATING_SERVICE_RESULT";
     public static final int REQUEST_SUCCESS = 0;
     public static final int REQUEST_ERROR = 1;
@@ -40,12 +41,19 @@ public class UpdatingService extends Service {
     private static final String currencyPrefix = "&tsyms=";
     private static final String fetchCoinListURL = "https://min-api.cryptocompare.com/data/all/coinlist";
     private static final String toCurrency = "USD";
+    private static final String fetchHistoricalDataHourURL = "https://min-api.cryptocompare.com/data/histohour?fsym=";
+    private static final String fetchHistoricalDataDayURL = "https://min-api.cryptocompare.com/data/histoday?fsym=";
 
     private List<CurrencyData> subscribedCurrencies = new ArrayList<>();
     private List<String> jsonResponses = new ArrayList<>();
     private HashMap<String, CurrencyMapValue> currencyMap = new HashMap<>();
+    private List<CurrencyHistoricalDataPoints> currencyHistoricalDataPointsList = new ArrayList<>();
 
     RequestQueue queue;
+
+    public enum dataType {
+        HOUR, DAY, MONTH, YEAR
+    }
 
     public class UpdatingServiceBinder extends Binder {
         UpdatingService getService() { return UpdatingService.this; }
@@ -209,5 +217,33 @@ public class UpdatingService extends Service {
             return true;
         }
         return false;
+    }
+
+    public void fetchHistoricalData(String coin, dataType type, int limit) {
+        //setup api request
+        String apiRequest = type == dataType.HOUR ? fetchHistoricalDataHourURL : fetchHistoricalDataDayURL;
+        apiRequest += coin + "&tsym=" + toCurrency + "&limit=" + String.valueOf(limit);
+
+        if(queue == null) {
+            queue = Volley.newRequestQueue(this);
+        }
+
+        HistoricalDataRequest stringRequest = new HistoricalDataRequest(apiRequest, null,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        CurrencyHistoricalDataPoints dataPoints = CurrencyJsonParser.parseCurrencyHistoricalData(response);
+                        currencyHistoricalDataPointsList.add(dataPoints);
+
+                        sendResult(REQUEST_SUCCESS, BROADCAST_UPDATING_SERVICE_HISTORICALDATA_RESULT);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        sendResult(REQUEST_ERROR, BROADCAST_UPDATING_SERVICE_HISTORICALDATA_RESULT);
+                    }
+                });
+        queue.add(stringRequest);
     }
 }
