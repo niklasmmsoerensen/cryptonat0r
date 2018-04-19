@@ -109,8 +109,12 @@ public class CurrencyData implements Parcelable{
         coinPrice = bundle.getFloat(PRICE);
         percentChange = bundle.getFloat(CHANGE);
         coinIconUrl = bundle.getString(IMAGEURL);
-        coinIcon = BitmapFactory.decodeByteArray(bundle.getByteArray(ICON), 0 ,bundle.getByteArray(ICON).length);
-        coinRate = BitmapFactory.decodeByteArray(bundle.getByteArray(RATE), 0 ,bundle.getByteArray(RATE).length);
+
+        if(bundle.getByteArray(ICON) != null)
+            coinIcon = BitmapFactory.decodeByteArray(bundle.getByteArray(ICON), 0 ,bundle.getByteArray(ICON).length);
+
+        if(bundle.getByteArray(RATE) != null)
+            coinRate = BitmapFactory.decodeByteArray(bundle.getByteArray(RATE), 0 ,bundle.getByteArray(RATE).length);
     }
 
     @Override
@@ -123,13 +127,17 @@ public class CurrencyData implements Parcelable{
         bundle.putFloat(PRICE, coinPrice);
         bundle.putFloat(CHANGE,percentChange);
 
-        ByteArrayOutputStream bs = new ByteArrayOutputStream();
-        coinIcon.compress(Bitmap.CompressFormat.PNG, 50, bs);
-        bundle.putByteArray(ICON,bs.toByteArray());
+        if(coinIcon != null) {
+            ByteArrayOutputStream bs = new ByteArrayOutputStream();
+            coinIcon.compress(Bitmap.CompressFormat.PNG, 50, bs);
+            bundle.putByteArray(ICON, bs.toByteArray());
+        }
 
-        ByteArrayOutputStream bs2 = new ByteArrayOutputStream();
-        coinRate.compress(Bitmap.CompressFormat.PNG, 50, bs2);
-        bundle.putByteArray(RATE,bs.toByteArray());
+        if(coinRate != null) {
+            ByteArrayOutputStream bs2 = new ByteArrayOutputStream();
+            coinRate.compress(Bitmap.CompressFormat.PNG, 50, bs2);
+            bundle.putByteArray(RATE, bs2.toByteArray());
+        }
 
         parcel.writeBundle(bundle);
     }

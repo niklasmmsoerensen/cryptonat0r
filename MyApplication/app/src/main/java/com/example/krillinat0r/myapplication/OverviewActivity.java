@@ -28,6 +28,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -79,6 +80,16 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
 
         setupConnectionToUpdatingService();
 
+        CurrencyList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                Intent graphIntent = new Intent(OverviewActivity.this, GraphActivity.class);
+                graphIntent.putExtra(GraphActivity.CURRENCY, subscribedCurrencies.get(position));
+                startActivity(graphIntent);
+            }
+        });
+
         //start and setup connection to service
         Log.d(LOG, "Starting service");
         Intent startService = new Intent(OverviewActivity.this, UpdatingService.class);
@@ -114,7 +125,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
                                     if(updatingService.addCoin(input.getText().toString().toUpperCase()))
                                     {
                                         Toast.makeText(OverviewActivity.this, getString(R.string.AddCoinSuccesful),Toast.LENGTH_SHORT).show();
-                                        //updatingService.UpdateList();
+                                        updatingService.fetchCoinList(); //Update list when new coin added
                                     }
                                     else
                                     {

@@ -10,4 +10,9 @@
     <string name="AddCoinSuccesful">Succesfully added new coin!</string>
     <string name="AddCoinFailed">Coin cannot be found!</string>
     <string name="InsertCoinName">Enter new coin name:</string>
+    <string name="HourBtnText">Hour</string>
+    <string name="LatestDayBtn">Day</string>
+    <string name="WeekBtnText">Week</string>
+    <string name="LatestMonthBtn">Month</string>
+    <string name="GraphTimeText">Show price of last</string>
 </resources>

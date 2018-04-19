@@ -30,6 +30,7 @@ public class UpdatingService extends Service {
     private static final String LOG = "Updating Service";
     public static final String BROADCAST_UPDATING_SERVICE_PRICES_RESULT = "com.example.krillinat0r.myapplication.BROADCAST_UPDATING_SERVICE_PRICES_RESULT";
     public static final String BROADCAST_UPDATING_SERVICE_COINLIST_RESULT = "com.example.krillinat0r.myapplication.BROADCAST_UPDATING_SERVICE_COINLIST_RESULT";
+    public static final String BROADCAST_UPDATING_SERVICE_COINHISTORY_RESULT = "com.example.krillinat0r.myapplication.BROADCAST_UPDATING_SERVICE_COINHISTORY_RESULT";
     public static final String EXTRA_REQUEST_RESULT = "UPDATING_SERVICE_RESULT";
     public static final int REQUEST_SUCCESS = 0;
     public static final int REQUEST_ERROR = 1;
