@@ -7,6 +7,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -81,5 +82,48 @@ public class CurrencyJsonParser {
             Log.d(JSONPARSERLOG, "JSON EXCEPTION" + e.toString());
         }
         return null;
+    }
+
+    public static CurrencyHistoricalDataPoints parseCurrencyHistoricalData(String jsonString) {
+        CurrencyHistoricalDataPoints historicalData;
+        List<CurrencyHistoricalData> dataPoints = new ArrayList<>();
+        double close, high, low, open, volumeFrom, volumeTo;
+
+        try {
+            JSONObject historicalDataObject = new JSONObject(jsonString);
+
+            //region extract currency from request
+            String requestUrl = historicalDataObject.getString("RequestUrl");
+            String split[] = requestUrl.split("[=&]+");
+            String currency = split[1];
+            //endregion
+
+            //region extract historical data
+            JSONArray dataArray = historicalDataObject.getJSONArray("Data");
+            for (int i = 0; i < dataArray.length(); i++) {
+                JSONObject dataObject = dataArray.getJSONObject(i);
+                Date timestamp = convertEpochTimestamp(dataObject.getInt("time"));
+                close = dataObject.getDouble("close");
+                high = dataObject.getDouble("high");
+                low = dataObject.getDouble("low");
+                open = dataObject.getDouble("open");
+                volumeFrom = dataObject.getDouble("volumefrom");
+                volumeTo = dataObject.getDouble("volumeto");
+                CurrencyHistoricalData dataPoint = new CurrencyHistoricalData(timestamp, close, high, low, open, volumeFrom, volumeTo);
+                dataPoints.add(dataPoint);
+            }
+            //endregion
+
+            historicalData = new CurrencyHistoricalDataPoints(currency, dataPoints);
+            return historicalData;
+        }catch (JSONException e) {
+            Log.d(JSONPARSERLOG, "JSON EXCEPTION" + e.toString());
+        }
+        return null;
+    }
+
+    static private Date convertEpochTimestamp(int timestamp) {
+        long epoch = Long.parseLong(String.valueOf(timestamp));
+        return new Date(epoch * 1000);
     }
 }
