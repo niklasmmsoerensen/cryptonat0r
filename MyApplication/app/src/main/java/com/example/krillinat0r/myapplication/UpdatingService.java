@@ -241,8 +241,8 @@ public class UpdatingService extends Service {
                 limit = 24;
                 break;
             case Week:
-                apiRequest = fetchHistoricalDataDayURL;
-                limit = 7;
+                apiRequest = fetchHistoricalDataHourURL;
+                limit = 28;
                 break;
             case Month:
                 apiRequest = fetchHistoricalDataDayURL;
@@ -261,8 +261,14 @@ public class UpdatingService extends Service {
                     @Override
                     public void onResponse(String response) {
                         CurrencyHistoricalDataPoints dataPoints = CurrencyJsonParser.parseCurrencyHistoricalData(response);
+                        for (int i = 0; i < currencyHistoricalDataPointsList.size(); i++) {
+                            if(currencyHistoricalDataPointsList.get(i).currency.equals(dataPoints.currency)) {
+                                currencyHistoricalDataPointsList.set(i, dataPoints);
+                                sendResult(REQUEST_SUCCESS, BROADCAST_UPDATING_SERVICE_HISTORICALDATA_RESULT);
+                                return;
+                            }
+                        }
                         currencyHistoricalDataPointsList.add(dataPoints);
-
                         sendResult(REQUEST_SUCCESS, BROADCAST_UPDATING_SERVICE_HISTORICALDATA_RESULT);
                     }
                 },

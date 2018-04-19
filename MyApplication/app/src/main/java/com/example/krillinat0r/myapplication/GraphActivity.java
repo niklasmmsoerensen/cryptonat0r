@@ -69,34 +69,35 @@ public class GraphActivity extends AppCompatActivity {
                 UpdatingService.class), updatingServiceConnection, Context.BIND_AUTO_CREATE);
 
         TimeScaleGroup = findViewById(R.id.TimeGroup);
+        TimeScaleGroup.check(R.id.LatestWeekBtn);
         TimeScaleGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
         {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 switch(checkedId)
                 {
-                    case 0:
+                    case R.id.LatestHourBtn:
                         currentTime = GraphTime.Hour;
                         break;
-                    case 1:
+                    case R.id.LatestDayBtn:
                         currentTime = GraphTime.Day;
                         break;
-                    case 2:
+                    case R.id.LatestWeekBtn:
                         currentTime = GraphTime.Week;
                         break;
-                    case 3:
+                    case R.id.LatestMonthBtn:
                         currentTime = GraphTime.Month;
                         break;
                 }
-                //Call updating service fetch
+                if(updatingService != null && updatingServiceConnection != null)
+                {
+                    updatingService.fetchHistoricalData(currentCurrency.getKey(), currentTime);
+                }
             }
         });
 
         graph = (GraphView) findViewById(R.id.graph);
         graph.setTitle(currentCurrency.getCoinName());
-
-        Date date = new Date();
-        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
         graph.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter() {
             @Override
@@ -127,7 +128,7 @@ public class GraphActivity extends AppCompatActivity {
             public void onServiceConnected(ComponentName className, IBinder service) {
                 Log.d(LOG, "onServiceConnected");
                 updatingService = ((UpdatingService.UpdatingServiceBinder)service).getService();
-
+                updatingService.fetchHistoricalData(currentCurrency.getKey(), currentTime);
                 Log.d("Binder", "Updating service connected");
             }
 
@@ -147,7 +148,8 @@ public class GraphActivity extends AppCompatActivity {
             if(result == 0) {
                 //success
                 Log.d(LOG, "CoinHistory OK!");
-                SetGraphToCoinHistoryData();
+                currencyHistory = updatingService.getCurrencyHistoricalDataPoints(currentCurrency.getKey());
+                setGraphToCoinHistoryData();
             }
             else {
                 //error
@@ -156,22 +158,14 @@ public class GraphActivity extends AppCompatActivity {
         }
     };
 
-    private void SetGraphToCoinHistoryData() {
-        DataPoint[] graphPoints = new DataPoint[]{};
+    private void setGraphToCoinHistoryData() {
+        DataPoint[] graphPoints = new DataPoint[currencyHistory.dataPoints.size()];
 
         for (int i = 0; i < currencyHistory.dataPoints.size(); i++) {
             graphPoints[i] = new DataPoint(currencyHistory.dataPoints.get(i).timestamp, currencyHistory.dataPoints.get(i).getClose());
         }
-
-
-
-        LineGraphSeries<DataPoint> series = new LineGraphSeries<>(new DataPoint[]{
-                new DataPoint(0, 1),
-                new DataPoint(1, 5),
-                new DataPoint(2, 3),
-                new DataPoint(3, 2),
-                new DataPoint(4, 6)
-        });
+        LineGraphSeries<DataPoint> series = new LineGraphSeries<>(graphPoints);
+        graph.removeAllSeries();
         graph.addSeries(series);
     }
 }
