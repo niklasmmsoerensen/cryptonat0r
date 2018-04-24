@@ -24,6 +24,7 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Calendar;
@@ -53,6 +54,7 @@ public class GraphActivity extends AppCompatActivity {
         Day,
         Week,
         Month,
+        Year,
     }
 
     public class CustomDateAsXAxisLabelFormatter extends DefaultLabelFormatter {
@@ -115,6 +117,10 @@ public class GraphActivity extends AppCompatActivity {
                     case R.id.LatestMonthBtn:
                         currentTime = GraphTime.Month;
                         break;
+
+                    case R.id.LatestYearBtn:
+                        currentTime = GraphTime.Year;
+                        break;
                 }
                 if(updatingService != null && updatingServiceConnection != null)
                 {
@@ -133,33 +139,79 @@ public class GraphActivity extends AppCompatActivity {
 
                                                            public String formatLabel(double value, boolean isValueX) {
                                                                if (isValueX) {
-                                                                   Calendar mCalendar = new GregorianCalendar();
+                                                                   Calendar mCalendar = Calendar.getInstance();
                                                                    // show normal x values
                                                                    long val = (long)value;
                                                                    Date d = new Date(val);
                                                                    mCalendar.setTime(d);
 
+                                                                   String ret = "";
                                                                    graph.getGridLabelRenderer().setHorizontalLabelsAngle(20);
                                                                    switch(currentTime)
                                                                    {
                                                                        case Hour:
-                                                                           return String.valueOf(mCalendar.get(Calendar.HOUR_OF_DAY)) + ":" + String.valueOf(mCalendar.get(Calendar.MINUTE));
+                                                                           if(String.valueOf(mCalendar.get(Calendar.HOUR_OF_DAY)).length() < 2)
+                                                                               ret += "0" + String.valueOf(mCalendar.get(Calendar.HOUR_OF_DAY));
+                                                                           else
+                                                                               ret += String.valueOf(mCalendar.get(Calendar.HOUR_OF_DAY));
+
+                                                                           ret += ":";
+                                                                           if(String.valueOf(mCalendar.get(Calendar.MINUTE)).length() < 2)
+                                                                               ret += "0" + String.valueOf(mCalendar.get(Calendar.MINUTE));
+                                                                           else
+                                                                               ret += String.valueOf(mCalendar.get(Calendar.MINUTE));
+
+                                                                           break;
 
                                                                        case Day:
-                                                                           return String.valueOf(mCalendar.get(Calendar.DAY_OF_MONTH)) + "/" + String.valueOf(mCalendar.get(Calendar.HOUR_OF_DAY)) + ":" + String.valueOf(mCalendar.get(Calendar.MINUTE));
+                                                                           ret += String.valueOf(mCalendar.get(Calendar.DAY_OF_MONTH)) + "/";
+
+                                                                       if(String.valueOf(mCalendar.get(Calendar.HOUR_OF_DAY)).length() < 2)
+                                                                           ret += "0" + String.valueOf(mCalendar.get(Calendar.HOUR_OF_DAY));
+                                                                       else
+                                                                           ret += String.valueOf(mCalendar.get(Calendar.HOUR_OF_DAY));
+
+                                                                       ret += ":";
+                                                                       if(String.valueOf(mCalendar.get(Calendar.MINUTE)).length() < 2)
+                                                                           ret += "0" + String.valueOf(mCalendar.get(Calendar.MINUTE));
+                                                                       else
+                                                                           ret += String.valueOf(mCalendar.get(Calendar.MINUTE));
+                                                                       break;
 
                                                                        case Week:
-                                                                           return String.valueOf(mCalendar.get(Calendar.DAY_OF_MONTH)) + "/" + String.valueOf(mCalendar.get(Calendar.HOUR_OF_DAY)) + ":" + String.valueOf(mCalendar.get(Calendar.MINUTE));
+                                                                           ret += String.valueOf(mCalendar.get(Calendar.DAY_OF_MONTH)) + "/";
+
+                                                                           if(String.valueOf(mCalendar.get(Calendar.HOUR_OF_DAY)).length() < 2)
+                                                                               ret += "0" + String.valueOf(mCalendar.get(Calendar.HOUR_OF_DAY));
+                                                                           else
+                                                                               ret += String.valueOf(mCalendar.get(Calendar.HOUR_OF_DAY));
+
+                                                                           ret += ":";
+                                                                           if(String.valueOf(mCalendar.get(Calendar.MINUTE)).length() < 2)
+                                                                               ret += "0" + String.valueOf(mCalendar.get(Calendar.MINUTE));
+                                                                           else
+                                                                               ret += String.valueOf(mCalendar.get(Calendar.MINUTE));
+                                                                           break;
 
                                                                        case Month:
-                                                                           return String.valueOf(mCalendar.get(Calendar.MONTH)) + "/" + String.valueOf(mCalendar.get(Calendar.DAY_OF_MONTH));
+
+                                                                           if(String.valueOf(mCalendar.get(Calendar.DAY_OF_MONTH)).length() < 2)
+                                                                               ret += "0" + String.valueOf(mCalendar.get(Calendar.DAY_OF_MONTH));
+                                                                           else
+                                                                               ret += String.valueOf(mCalendar.get(Calendar.DAY_OF_MONTH));
+
+                                                                           ret += new SimpleDateFormat("MMM").format(mCalendar.getTime());
+
+                                                                           break;
+
+                                                                       case Year:
+                                                                           return String.valueOf(mCalendar.get(Calendar.YEAR)) + "/" + String.valueOf(mCalendar.get(Calendar.MONTH));
                                                                    }
-                                                                   return new String();
-                                                                   //this.mCalendar.setTimeInMillis((long)value);
-                                                                   //return this.mDateFormat.format(Long.valueOf(this.mCalendar.getTimeInMillis()));
+                                                                   return ret;
+
                                                                } else {
                                                                    // show currency for y values
-                                                                   return "$" + super.formatLabel(value, isValueX);
+                                                                   return super.formatLabel(value, isValueX) + "$";
                                                                }
                                                            }
                                                        });
@@ -169,7 +221,8 @@ public class GraphActivity extends AppCompatActivity {
         //graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(GraphActivity.this));
         // as we use dates as labels, the human rounding to nice readable numbers
         // is not necessary
-        //graph.getGridLabelRenderer().setHumanRounding(true);
+        graph.getGridLabelRenderer().setHumanRounding(true);
+        graph.getGridLabelRenderer().setLabelVerticalWidth(100);
     }
 
     @Override
@@ -242,17 +295,37 @@ public class GraphActivity extends AppCompatActivity {
 
             if(graphPoints[i].getY() > maxValY)
                 maxValY = graphPoints[i].getY();
-
         }
 
         graph.getViewport().setXAxisBoundsManual(true);
-        graph.getViewport().setMinX(graphPoints[0].getX());
-        graph.getViewport().setMaxX(graphPoints[graphPoints.length-1].getX());
+
+        double xAxisSpaceAddition = 0;
+        switch(currentTime)
+        {
+            case Hour:
+                xAxisSpaceAddition = 1000*60*2; // 2 minutes
+                break;
+
+            case Day:
+                xAxisSpaceAddition = 1000*60*60; // 1 Hour
+                break;
+
+            case Week:
+                xAxisSpaceAddition = 1000*60*60*8; // 8 Hours
+                break;
+
+            case Month:
+                xAxisSpaceAddition = 1000*60*60*24; //24 Hours
+                break;
+        }
+
+        graph.getViewport().setMinX(graphPoints[0].getX() - xAxisSpaceAddition);
+        graph.getViewport().setMaxX(graphPoints[graphPoints.length-1].getX() + xAxisSpaceAddition*2);
+        graph.getViewport().setScalable(true);
 
         graph.getViewport().setYAxisBoundsManual(true);
-        graph.getViewport().setMinY(minValY);
-        graph.getViewport().setMaxY(maxValY);
-        graph.getGridLabelRenderer().setNumHorizontalLabels(6);
+        graph.getViewport().setMinY(minValY - (maxValY-minValY)/5);
+        graph.getViewport().setMaxY(maxValY + (maxValY-minValY)/5);
         graph.addSeries(series);
 
     }
