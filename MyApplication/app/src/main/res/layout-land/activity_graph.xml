@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.krillinat0r.myapplication.GraphActivity">
+
+    <com.jjoe64.graphview.GraphView
+        android:id="@+id/graph"
+        android:layout_width="572dp"
+        android:layout_height="200dip"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <RadioGroup
+        android:id="@+id/TimeGroup"
+        android:layout_width="447dp"
+        android:layout_height="39dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/graph">
+
+        <RadioButton
+            android:id="@+id/LatestHourBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_weight="1"
+            android:text="@string/HourBtnText"
+            app:layout_constraintStart_toEndOf="@+id/GraphTimeText"
+            app:layout_constraintTop_toTopOf="@+id/GraphTimeText" />
+
+        <RadioButton
+            android:id="@+id/LatestDayBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_weight="1"
+            android:text="@string/LatestDayBtn"
+            app:layout_constraintStart_toStartOf="@+id/LatestHourBtn"
+            app:layout_constraintTop_toBottomOf="@+id/LatestHourBtn" />
+
+        <RadioButton
+            android:id="@+id/LatestWeekBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_weight="1"
+            android:text="@string/WeekBtnText"
+            app:layout_constraintStart_toStartOf="@+id/LatestDayBtn"
+            app:layout_constraintTop_toBottomOf="@+id/LatestDayBtn" />
+
+        <RadioButton
+            android:id="@+id/LatestMonthBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_weight="1"
+            android:text="@string/LatestMonthBtn"
+            app:layout_constraintStart_toStartOf="@+id/LatestWeekBtn"
+            app:layout_constraintTop_toBottomOf="@+id/LatestWeekBtn" />
+
+        <RadioButton
+            android:id="@+id/LatestYearBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_weight="1"
+            android:text="@string/LatestYearBtn"
+            app:layout_constraintStart_toStartOf="@+id/LatestYearBtn"
+            app:layout_constraintTop_toBottomOf="@+id/LatestYearBtn" />
+    </RadioGroup>
+
+</android.support.constraint.ConstraintLayout>
