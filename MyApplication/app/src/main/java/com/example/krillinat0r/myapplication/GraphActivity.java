@@ -18,13 +18,17 @@ import android.widget.RadioGroup;
 
 import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class GraphActivity extends AppCompatActivity {
 
@@ -51,6 +55,29 @@ public class GraphActivity extends AppCompatActivity {
         Month,
     }
 
+    public class CustomDateAsXAxisLabelFormatter extends DefaultLabelFormatter {
+        protected final DateFormat mDateFormat;
+        protected final Calendar mCalendar;
+
+        public CustomDateAsXAxisLabelFormatter(Context context) {
+            this.mDateFormat = android.text.format.DateFormat.getDateFormat(context);
+            this.mCalendar = Calendar.getInstance();
+        }
+
+        public CustomDateAsXAxisLabelFormatter(Context context, DateFormat dateFormat) {
+            this.mDateFormat = dateFormat;
+            this.mCalendar = Calendar.getInstance();
+        }
+
+        public String formatLabel(double value, boolean isValueX) {
+            if(isValueX) {
+                this.mCalendar.setTimeInMillis((long)value);
+                return this.mDateFormat.format(Long.valueOf(this.mCalendar.getTimeInMillis()));
+            } else {
+                return super.formatLabel(value, isValueX);
+            }
+        }
+    }
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,17 +127,49 @@ public class GraphActivity extends AppCompatActivity {
         graph.setTitle(currentCurrency.getCoinName());
 
         graph.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter() {
-            @Override
-            public String formatLabel(double value, boolean isValueX) {
-                if (isValueX) {
-                    // show normal x values
-                    return super.formatLabel(value, isValueX);
-                } else {
-                    // show currency for y values
-                    return "$" + super.formatLabel(value,isValueX);
-                }
-            }
-        });
+
+                                                           DateFormat mDateFormat =  android.text.format.DateFormat.getDateFormat(GraphActivity.this);
+                                                           @Override
+
+                                                           public String formatLabel(double value, boolean isValueX) {
+                                                               if (isValueX) {
+                                                                   Calendar mCalendar = new GregorianCalendar();
+                                                                   // show normal x values
+                                                                   long val = (long)value;
+                                                                   Date d = new Date(val);
+                                                                   mCalendar.setTime(d);
+
+                                                                   graph.getGridLabelRenderer().setHorizontalLabelsAngle(20);
+                                                                   switch(currentTime)
+                                                                   {
+                                                                       case Hour:
+                                                                           return String.valueOf(mCalendar.get(Calendar.HOUR_OF_DAY)) + ":" + String.valueOf(mCalendar.get(Calendar.MINUTE));
+
+                                                                       case Day:
+                                                                           return String.valueOf(mCalendar.get(Calendar.DAY_OF_MONTH)) + "/" + String.valueOf(mCalendar.get(Calendar.HOUR_OF_DAY)) + ":" + String.valueOf(mCalendar.get(Calendar.MINUTE));
+
+                                                                       case Week:
+                                                                           return String.valueOf(mCalendar.get(Calendar.DAY_OF_MONTH)) + "/" + String.valueOf(mCalendar.get(Calendar.HOUR_OF_DAY)) + ":" + String.valueOf(mCalendar.get(Calendar.MINUTE));
+
+                                                                       case Month:
+                                                                           return String.valueOf(mCalendar.get(Calendar.MONTH)) + "/" + String.valueOf(mCalendar.get(Calendar.DAY_OF_MONTH));
+                                                                   }
+                                                                   return new String();
+                                                                   //this.mCalendar.setTimeInMillis((long)value);
+                                                                   //return this.mDateFormat.format(Long.valueOf(this.mCalendar.getTimeInMillis()));
+                                                               } else {
+                                                                   // show currency for y values
+                                                                   return "$" + super.formatLabel(value, isValueX);
+                                                               }
+                                                           }
+                                                       });
+
+
+        // set date label formatter
+        //graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(GraphActivity.this));
+        // as we use dates as labels, the human rounding to nice readable numbers
+        // is not necessary
+        //graph.getGridLabelRenderer().setHumanRounding(true);
     }
 
     @Override
@@ -145,6 +204,7 @@ public class GraphActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             Log.d(LOG, "Broadcast received: CoinHistory");
             int result = intent.getIntExtra(UpdatingService.EXTRA_REQUEST_RESULT, 1);
+
             if(result == 0) {
                 //success
                 Log.d(LOG, "CoinHistory OK!");
@@ -162,10 +222,38 @@ public class GraphActivity extends AppCompatActivity {
         DataPoint[] graphPoints = new DataPoint[currencyHistory.dataPoints.size()];
 
         for (int i = 0; i < currencyHistory.dataPoints.size(); i++) {
-            graphPoints[i] = new DataPoint(currencyHistory.dataPoints.get(i).timestamp, currencyHistory.dataPoints.get(i).getClose());
+
+            graphPoints[i] = new DataPoint(currencyHistory.dataPoints.get(i).timestamp.getTime(), currencyHistory.dataPoints.get(i).getClose());
         }
         LineGraphSeries<DataPoint> series = new LineGraphSeries<>(graphPoints);
         graph.removeAllSeries();
+
+        double minValY = 0;
+        double maxValY = 0;
+        for(int i = 0; i < graphPoints.length; i++)
+        {
+            if(i == 0)
+            {
+                minValY = graphPoints[i].getY();
+                maxValY = graphPoints[i].getY();
+            }
+            if(graphPoints[i].getY() < minValY)
+                minValY = graphPoints[i].getY();
+
+            if(graphPoints[i].getY() > maxValY)
+                maxValY = graphPoints[i].getY();
+
+        }
+
+        graph.getViewport().setXAxisBoundsManual(true);
+        graph.getViewport().setMinX(graphPoints[0].getX());
+        graph.getViewport().setMaxX(graphPoints[graphPoints.length-1].getX());
+
+        graph.getViewport().setYAxisBoundsManual(true);
+        graph.getViewport().setMinY(minValY);
+        graph.getViewport().setMaxY(maxValY);
+        graph.getGridLabelRenderer().setNumHorizontalLabels(6);
         graph.addSeries(series);
+
     }
 }
