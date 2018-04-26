@@ -250,8 +250,11 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_refresh) {
+            if(updatingService != null) {
+                updatingService.forceFetchDetails();
+                return true;
+            }
         }
 
         return super.onOptionsItemSelected(item);

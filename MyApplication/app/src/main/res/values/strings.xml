@@ -24,4 +24,5 @@
     <string name="ChangePctText">%Change(24H)</string>
     <string name="TotalSupplyText">Total Supply:</string>
     <string name="MarketCapText">Market Cap:</string>
+    <string name="action_refresh">Refresh</string>
 </resources>
