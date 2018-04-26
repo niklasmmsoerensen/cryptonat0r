@@ -54,29 +54,39 @@ public class CurrencyJsonParser {
         return CurrencyMap;
     }
 
-    public static List<CurrencyPriceData> parseCurrencyPrice(String jsonString) {
+    public static List<CurrencyDetailData> parseCurrencyDetails(String jsonString) {
 
-        List<CurrencyPriceData> priceList = new ArrayList<>();
+        List<CurrencyDetailData> detailList = new ArrayList<>();
 
         try {
-            JSONObject priceObjects = new JSONObject(jsonString);
-            Iterator<String> keys = priceObjects.keys(); //Get all objectkeys within DataList
+            JSONObject DetailObject = new JSONObject(jsonString);
+            JSONObject RawData = DetailObject.getJSONObject("RAW");
+            JSONObject DisplayData = DetailObject.getJSONObject("DISPLAY");
+            Iterator<String> keys = RawData.keys(); //Get all objectkeys within DataList
             while(keys.hasNext())
             {
                 try {
                     String key = keys.next(); //Get next key in list
-                    if (priceObjects.get(key) instanceof JSONObject) {
-                        JSONObject priceObject = priceObjects.getJSONObject(key);
-                        float price = (float) priceObject.getDouble("USD");
-                        CurrencyPriceData currentCurrency = new CurrencyPriceData(key, price);
-                        priceList.add(currentCurrency);
+                    if (RawData.get(key) instanceof JSONObject) {
+                        JSONObject detailRaw = RawData.getJSONObject(key).getJSONObject("USD");
+                        JSONObject detailDisp = DisplayData.getJSONObject(key).getJSONObject("USD");
+
+                        float price = (float) detailRaw.getDouble("PRICE");
+                        float changePercent = (float) detailRaw.getDouble("CHANGEPCT24HOUR");
+                        float changeFlat = (float) detailRaw.getDouble("CHANGE24HOUR");
+                        String Supply = (String) detailDisp.getString("SUPPLY");
+                        String MarketCap = (String) detailDisp.getString("MKTCAP");
+
+                        CurrencyDetailData currentCurrency = new CurrencyDetailData(key, price, changePercent, changeFlat, Supply, MarketCap);
+
+                        detailList.add(currentCurrency);
                     }
                 }
                 catch (JSONException e) {
                     Log.d(JSONPARSERLOG, "JSON EXCEPTION (" + keys.next() + "): " + e.toString());
                 }
             }
-            return priceList;
+            return detailList;
             
         }catch (JSONException e) {
             Log.d(JSONPARSERLOG, "JSON EXCEPTION" + e.toString());

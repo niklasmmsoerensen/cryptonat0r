@@ -17,6 +17,9 @@ public class CurrencyData implements Parcelable{
     private String key;
     private String coinName;
     private float percentChange;
+    private float flatChange;
+    private String totalSupply;
+    private String marketCap;
     private float coinPrice;
     private Bitmap coinIcon;
     private String coinIconUrl;
@@ -29,8 +32,35 @@ public class CurrencyData implements Parcelable{
     private static final String IMAGEURL = "IMAGEURL";
     private static final String RATE = "RATE";
     private static final String ICON = "ICON";
+    private static final String SUPPLY = "SUPPLY";
+    private static final String FLATCHANGE = "FLAT";
+    private static final String MARKETCAP = "MARKETCAP";
 
     public CurrencyData(){}
+
+    public float getFlatChange() {
+        return flatChange;
+    }
+
+    public void setFlatChange(float flatChange) {
+        this.flatChange = flatChange;
+    }
+
+    public String getTotalSupply() {
+        return totalSupply;
+    }
+
+    public void setTotalSupply(String totalSupply) {
+        this.totalSupply = totalSupply;
+    }
+
+    public String getMarketCap() {
+        return marketCap;
+    }
+
+    public void setMarketCap(String marketCap) {
+        this.marketCap = marketCap;
+    }
 
     public String getKey() {
         return key;
@@ -109,6 +139,9 @@ public class CurrencyData implements Parcelable{
         coinPrice = bundle.getFloat(PRICE);
         percentChange = bundle.getFloat(CHANGE);
         coinIconUrl = bundle.getString(IMAGEURL);
+        flatChange = bundle.getFloat(FLATCHANGE);
+        totalSupply = bundle.getString(SUPPLY);
+        marketCap = bundle.getString(MARKETCAP);
 
         if(bundle.getByteArray(ICON) != null)
             coinIcon = BitmapFactory.decodeByteArray(bundle.getByteArray(ICON), 0 ,bundle.getByteArray(ICON).length);
@@ -126,6 +159,9 @@ public class CurrencyData implements Parcelable{
         bundle.putString(IMAGEURL, coinIconUrl);
         bundle.putFloat(PRICE, coinPrice);
         bundle.putFloat(CHANGE,percentChange);
+        bundle.putFloat(FLATCHANGE, flatChange);
+        bundle.putString(SUPPLY, totalSupply);
+        bundle.putString(MARKETCAP, marketCap);
 
         if(coinIcon != null) {
             ByteArrayOutputStream bs = new ByteArrayOutputStream();

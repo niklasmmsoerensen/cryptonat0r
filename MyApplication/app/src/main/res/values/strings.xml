@@ -16,4 +16,10 @@
     <string name="LatestMonthBtn">Month</string>
     <string name="GraphTimeText">Show price of last</string>
     <string name= "LatestYearBtn">Year</string>
+    <string name="TotalVolText">Volume</string>
+    <string name="PriceText">Price</string>
+    <string name="ChangeFlatText">Change(24H)</string>
+    <string name="ChangePctText">%Change(24H)</string>
+    <string name="TotalSupplyText">Total Supply:</string>
+    <string name="MarketCapText">Market Cap:</string>
 </resources>

@@ -37,7 +37,7 @@ public class UpdatingService extends Service {
     public static final int REQUEST_ERROR = 1;
     public static final String SUBSCRIBED_CURRENCIES = "SubscribedCurrencies";
 
-    private static final String fetchPricesBaseURL = "https://min-api.cryptocompare.com/data/pricemulti?fsyms=";
+    private static final String fetchDetailsBaseURL = "https://min-api.cryptocompare.com/data/pricemultifull?fsyms=";
     private static final String currencyPrefix = "&tsyms=";
     private static final String fetchCoinListURL = "https://min-api.cryptocompare.com/data/all/coinlist";
     private static final String toCurrency = "USD";
@@ -91,17 +91,17 @@ public class UpdatingService extends Service {
                 Log.d(LOG, "JSON ERROR: " + e.toString());
             }
         }
-        fetchPrices();
+        fetchDetails();
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private void fetchPrices() {
+    private void fetchDetails() {
         String apiRequest = "";
         if(queue == null) {
             queue = Volley.newRequestQueue(this);
         }
 
-        apiRequest = fetchPricesBaseURL;
+        apiRequest = fetchDetailsBaseURL;
         for(int i = 0; i < subscribedCurrencies.size(); i++) {
             if((i+1) != subscribedCurrencies.size()) {
                 apiRequest += subscribedCurrencies.get(i).getKey() + ",";
@@ -119,14 +119,21 @@ public class UpdatingService extends Service {
                         //set private list of coins in here and broadcast
                         //that request was OK/FAIL
                         //bound service should be able to access list by using GET method
-                        List<CurrencyPriceData> updatedPrices = CurrencyJsonParser.parseCurrencyPrice(response);
+                        List<CurrencyDetailData> updatedDetails = CurrencyJsonParser.parseCurrencyDetails(response);
 
-                        for(int i = 0; i < updatedPrices.size(); i++)
+                        for(int i = 0; i < updatedDetails.size(); i++)
                         {
                             for(int j = 0; j < subscribedCurrencies.size(); j++)
                             {
-                                if(updatedPrices.get(i).getKey().equals(subscribedCurrencies.get(j).getKey()))
-                                    subscribedCurrencies.get(j).setCoinPrice(updatedPrices.get(i).getPrice());
+                                if(updatedDetails.get(i).getKey().equals(subscribedCurrencies.get(j).getKey()))
+                                {
+                                    subscribedCurrencies.get(j).setCoinPrice(updatedDetails.get(i).getPrice());
+                                    subscribedCurrencies.get(j).setPercentChange(updatedDetails.get(i).getChangePercent());
+                                    subscribedCurrencies.get(j).setFlatChange(updatedDetails.get(i).getChangeFlat());
+                                    subscribedCurrencies.get(j).setTotalSupply(updatedDetails.get(i).getSupply());
+                                    subscribedCurrencies.get(j).setMarketCap(updatedDetails.get(i).getMarketCap());
+                                    //Set all variables
+                                }
                             }
                         }
                         sendResult(REQUEST_SUCCESS, BROADCAST_UPDATING_SERVICE_PRICES_RESULT);
@@ -143,7 +150,7 @@ public class UpdatingService extends Service {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                    fetchPrices();
+                    fetchDetails();
             }
         }, 10000);
     }

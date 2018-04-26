@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.RequiresApi;
@@ -15,6 +16,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
@@ -43,8 +46,20 @@ public class GraphActivity extends AppCompatActivity {
     private boolean bound = false;
 
     private GraphView graph;
-    private RadioGroup TimeScaleGroup;
     private GraphTime currentTime;
+    private SeekBar timeBar;
+
+    private TextView Hour;
+    private TextView Day;
+    private TextView Week;
+    private TextView Month;
+    private TextView Year;
+
+    private TextView Price;
+    private TextView ChangeFlat;
+    private TextView ChangePct;
+    private TextView Supply;
+    private TextView MarketCap;
 
     private CurrencyHistoricalDataPoints currencyHistory;
 
@@ -57,29 +72,6 @@ public class GraphActivity extends AppCompatActivity {
         Year
     }
 
-    public class CustomDateAsXAxisLabelFormatter extends DefaultLabelFormatter {
-        protected final DateFormat mDateFormat;
-        protected final Calendar mCalendar;
-
-        public CustomDateAsXAxisLabelFormatter(Context context) {
-            this.mDateFormat = android.text.format.DateFormat.getDateFormat(context);
-            this.mCalendar = Calendar.getInstance();
-        }
-
-        public CustomDateAsXAxisLabelFormatter(Context context, DateFormat dateFormat) {
-            this.mDateFormat = dateFormat;
-            this.mCalendar = Calendar.getInstance();
-        }
-
-        public String formatLabel(double value, boolean isValueX) {
-            if(isValueX) {
-                this.mCalendar.setTimeInMillis((long)value);
-                return this.mDateFormat.format(Long.valueOf(this.mCalendar.getTimeInMillis()));
-            } else {
-                return super.formatLabel(value, isValueX);
-            }
-        }
-    }
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,38 +79,97 @@ public class GraphActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_graph);
 
-        currentTime = GraphTime.Week;
+        Price = findViewById(R.id.PriceText);
+        ChangeFlat = findViewById(R.id.ChangeFlatText);
+        ChangePct = findViewById(R.id.ChangePctText);
+        Supply = findViewById(R.id.SupplyText);
+        MarketCap = findViewById(R.id.MktCapText);
 
         currentCurrency = (CurrencyData) getIntent().getParcelableExtra(CURRENCY);
 
-        setupConnectionToUpdatingService();
+        DecimalFormat df = new DecimalFormat("#.##");
 
-        //bind to service
-        bindService(new Intent(GraphActivity.this,
-                UpdatingService.class), updatingServiceConnection, Context.BIND_AUTO_CREATE);
+        if(currentCurrency.getFlatChange() > 0) {
+            ChangeFlat.setText("+" + String.valueOf(df.format(currentCurrency.getFlatChange()))); //Set coin value change
+            ChangeFlat.setTextColor(getResources().getColor(R.color.PositivePrice));
+        }
+        else {
+            ChangeFlat.setText(String.valueOf(df.format(currentCurrency.getFlatChange()))); //Set coin value change
+            ChangeFlat.setTextColor(getResources().getColor(R.color.NegativePrice));
+        }
 
-        TimeScaleGroup = findViewById(R.id.TimeGroup);
-        TimeScaleGroup.check(R.id.LatestWeekBtn);
-        TimeScaleGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
-        {
+        if(currentCurrency.getPercentChange() > 0) {
+            ChangePct.setText("+" + String.valueOf(df.format(currentCurrency.getPercentChange())) + " %"); //Set coin value change
+            ChangePct.setTextColor(getResources().getColor(R.color.PositivePrice));
+        }
+        else {
+            ChangePct.setText(String.valueOf(df.format(currentCurrency.getPercentChange())) + " %"); //Set coin value change
+            ChangePct.setTextColor(getResources().getColor(R.color.NegativePrice));
+        }
+
+        Price.setText("$ " + String.valueOf(currentCurrency.getCoinPrice()));
+        Supply.setText(String.valueOf(currentCurrency.getTotalSupply()));
+        MarketCap.setText(String.valueOf(currentCurrency.getMarketCap()));
+
+        Hour = findViewById(R.id.HourText);
+        Day = findViewById(R.id.DayText);
+        Week = findViewById(R.id.WeekText);
+        Month = findViewById(R.id.MonthText);
+        Year = findViewById(R.id.YearText);
+
+        currentTime = GraphTime.Week;
+
+        Hour.setEnabled(false);
+        Day.setEnabled(false);
+        Week.setEnabled(true);
+        Month.setEnabled(false);
+        Year.setEnabled(false);
+
+        timeBar = findViewById(R.id.TimeScale);
+        timeBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch(checkedId)
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                switch(seekBar.getProgress())
                 {
-                    case R.id.LatestHourBtn:
+                    case 0:
                         currentTime = GraphTime.Hour;
+                        Hour.setEnabled(true);
+                        Day.setEnabled(false);
+                        Week.setEnabled(false);
+                        Month.setEnabled(false);
+                        Year.setEnabled(false);
                         break;
-                    case R.id.LatestDayBtn:
+                    case 1:
                         currentTime = GraphTime.Day;
+                        Hour.setEnabled(false);
+                        Day.setEnabled(true);
+                        Week.setEnabled(false);
+                        Month.setEnabled(false);
+                        Year.setEnabled(false);
                         break;
-                    case R.id.LatestWeekBtn:
+                    case 2:
                         currentTime = GraphTime.Week;
+                        Hour.setEnabled(false);
+                        Day.setEnabled(false);
+                        Week.setEnabled(true);
+                        Month.setEnabled(false);
+                        Year.setEnabled(false);
                         break;
-                    case R.id.LatestMonthBtn:
+                    case 3:
                         currentTime = GraphTime.Month;
+                        Hour.setEnabled(false);
+                        Day.setEnabled(false);
+                        Week.setEnabled(false);
+                        Month.setEnabled(true);
+                        Year.setEnabled(false);
                         break;
-                    case R.id.LatestYearBtn:
+                    case 4:
                         currentTime = GraphTime.Year;
+                        Hour.setEnabled(false);
+                        Day.setEnabled(false);
+                        Week.setEnabled(false);
+                        Month.setEnabled(false);
+                        Year.setEnabled(true);
                         break;
                 }
                 if(updatingService != null && updatingServiceConnection != null)
@@ -126,7 +177,58 @@ public class GraphActivity extends AppCompatActivity {
                     updatingService.fetchHistoricalData(currentCurrency.getKey(), currentTime);
                 }
             }
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                switch(progress)
+                {
+                    case 0:
+                        Hour.setEnabled(true);
+                        Day.setEnabled(false);
+                        Week.setEnabled(false);
+                        Month.setEnabled(false);
+                        Year.setEnabled(false);
+                        break;
+                    case 1:
+                        Hour.setEnabled(false);
+                        Day.setEnabled(true);
+                        Week.setEnabled(false);
+                        Month.setEnabled(false);
+                        Year.setEnabled(false);
+                        break;
+                    case 2:
+                        Hour.setEnabled(false);
+                        Day.setEnabled(false);
+                        Week.setEnabled(true);
+                        Month.setEnabled(false);
+                        Year.setEnabled(false);
+                        break;
+                    case 3:
+                        Hour.setEnabled(false);
+                        Day.setEnabled(false);
+                        Week.setEnabled(false);
+                        Month.setEnabled(true);
+                        Year.setEnabled(false);
+                        break;
+                    case 4:
+                        Hour.setEnabled(false);
+                        Day.setEnabled(false);
+                        Week.setEnabled(false);
+                        Month.setEnabled(false);
+                        Year.setEnabled(true);
+                        break;
+                }
+            }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
         });
+
+        setupConnectionToUpdatingService();
+
+        //bind to service
+        bindService(new Intent(GraphActivity.this,
+                UpdatingService.class), updatingServiceConnection, Context.BIND_AUTO_CREATE);
 
         graph = (GraphView) findViewById(R.id.graph);
         graph.setTitle(currentCurrency.getCoinName());
@@ -210,18 +312,10 @@ public class GraphActivity extends AppCompatActivity {
 
                                                                } else {
                                                                    // show currency for y values
-                                                                   return super.formatLabel(value, isValueX) + "$";
+                                                                   return "$" + super.formatLabel(value, isValueX);
                                                                }
                                                            }
                                                        });
-
-
-        // set date label formatter
-        //graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(GraphActivity.this));
-        // as we use dates as labels, the human rounding to nice readable numbers
-        // is not necessary
-        graph.getGridLabelRenderer().setHumanRounding(true);
-        graph.getGridLabelRenderer().setLabelVerticalWidth(100);
     }
 
     @Override
