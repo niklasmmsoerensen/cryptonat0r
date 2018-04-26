@@ -237,17 +237,20 @@ public class UpdatingService extends Service {
                 limit = 60;
             break;
             case Day:
-                apiRequest = fetchHistoricalDataHourURL;
-                limit = 24;
+                apiRequest = fetchHistoricalDataMinuteURL;
+                limit = 60*24;
                 break;
             case Week:
                 apiRequest = fetchHistoricalDataHourURL;
-                limit = 28;
+                limit = 7*24;
                 break;
             case Month:
-                apiRequest = fetchHistoricalDataDayURL;
-                limit = 30;
+                apiRequest = fetchHistoricalDataHourURL;
+                limit = 30*24;
                 break;
+            case Year:
+                apiRequest = fetchHistoricalDataDayURL;
+                limit = 365;
         }
         apiRequest += coin + "&tsym=" + toCurrency + "&limit=" + String.valueOf(limit);
         //endregion

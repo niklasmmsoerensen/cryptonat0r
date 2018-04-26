@@ -49,6 +49,7 @@ public class GraphActivity extends AppCompatActivity {
         Day,
         Week,
         Month,
+        Year
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -87,6 +88,9 @@ public class GraphActivity extends AppCompatActivity {
                         break;
                     case R.id.LatestMonthBtn:
                         currentTime = GraphTime.Month;
+                        break;
+                    case R.id.LatestYearBtn:
+                        currentTime = GraphTime.Year;
                         break;
                 }
                 if(updatingService != null && updatingServiceConnection != null)

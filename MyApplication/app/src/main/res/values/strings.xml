@@ -15,4 +15,5 @@
     <string name="WeekBtnText">Week</string>
     <string name="LatestMonthBtn">Month</string>
     <string name="GraphTimeText">Show price of last</string>
+    <string name="LatestYearBtn">Year</string>
 </resources>

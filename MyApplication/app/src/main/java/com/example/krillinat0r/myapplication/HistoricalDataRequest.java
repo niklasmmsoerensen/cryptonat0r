@@ -48,12 +48,15 @@ public class HistoricalDataRequest<String> extends Request<java.lang.String> {
     @Override
     protected Response<java.lang.String> parseNetworkResponse(NetworkResponse response) {
         try {
+            //region insert request URL as part of the response, needed later to identify which currency response is for
             java.lang.String request = "\"RequestUrl\":" + "\"" + requestUrl + "\"" + ",";
             byte[] byteRequest = request.getBytes();
             byte[] combinedResponse = new byte[response.data.length + byteRequest.length];
             System.arraycopy(response.data, 0, combinedResponse, 0, 1);
             System.arraycopy(byteRequest, 0, combinedResponse, 1, byteRequest.length);
             System.arraycopy(response.data, 1, combinedResponse, byteRequest.length + 1, response.data.length - 1);
+            //endregion
+
             java.lang.String json = new java.lang.String(
                     combinedResponse,
                     HttpHeaderParser.parseCharset(response.headers));
