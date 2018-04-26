@@ -91,7 +91,7 @@ public class UpdatingService extends Service {
                 Log.d(LOG, "JSON ERROR: " + e.toString());
             }
         }
-        fetchDetails();
+        fetchDetails(false);
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -99,7 +99,7 @@ public class UpdatingService extends Service {
         fetchDetails(true);
     }
 
-    private void fetchDetails() {
+    private void fetchDetails(boolean forceUpdate) {
         String apiRequest = "";
         if(queue == null) {
             queue = Volley.newRequestQueue(this);
@@ -229,7 +229,7 @@ public class UpdatingService extends Service {
             Gson gson = new Gson();
             editor.putString(SUBSCRIBED_CURRENCIES, gson.toJson(subscribedCurrencies));
             editor.commit();
-            fetchPrices(true);
+            fetchDetails(true);
             return true;
         }
         return false;
@@ -246,7 +246,7 @@ public class UpdatingService extends Service {
                 Gson gson = new Gson();
                 editor.putString(SUBSCRIBED_CURRENCIES, gson.toJson(subscribedCurrencies));
                 editor.commit();
-                fetchPrices(true);
+                fetchDetails(true);
                 return;
             }
         }

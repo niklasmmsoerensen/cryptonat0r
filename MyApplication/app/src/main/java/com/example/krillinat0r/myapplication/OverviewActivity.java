@@ -172,7 +172,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
                         // This method performs the actual data-refresh operation.
                         // The method calls setRefreshing(false) when it's finished.
                         if(updatingService != null) {
-                            updatingService.forceFetchPrices();
+                            updatingService.forceFetchDetails();
                         }
                     }
                 });
