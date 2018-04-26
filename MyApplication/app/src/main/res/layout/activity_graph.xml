@@ -9,77 +9,199 @@
     <com.jjoe64.graphview.GraphView
         android:id="@+id/graph"
         android:layout_width="0dp"
-        android:layout_height="251dp"
+        android:layout_height="275dp"
         android:layout_marginTop="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <SeekBar
+        android:id="@+id/TimeScale"
+        style="@style/Widget.AppCompat.SeekBar.Discrete"
+        android:layout_width="0dp"
+        android:layout_height="44dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginStart="32dp"
+        android:max="4"
+        android:progress="2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/WeekText" />
+
     <TextView
-        android:id="@+id/GraphTimeText"
+        android:id="@+id/HourText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="176dp"
-        android:layout_marginTop="16dp"
-        android:text="@string/GraphTimeText"
+        android:layout_marginTop="8dp"
+        android:text="@string/HourBtnText"
+        android:textSize="24sp"
         app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/TimeScale"
         app:layout_constraintTop_toBottomOf="@+id/graph" />
 
-    <RadioGroup
-        android:id="@+id/TimeGroup"
+    <TextView
+        android:id="@+id/DayText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@+id/GraphTimeText"
-        app:layout_constraintTop_toTopOf="@+id/GraphTimeText">
+        android:layout_marginStart="68dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/LatestDayBtn"
+        android:textSize="24sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/TimeScale"
+        app:layout_constraintTop_toBottomOf="@+id/graph" />
 
-        <RadioButton
-            android:id="@+id/LatestHourBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/HourBtnText"
-            app:layout_constraintStart_toEndOf="@+id/GraphTimeText"
-            app:layout_constraintTop_toTopOf="@+id/GraphTimeText" />
+    <TextView
+        android:id="@+id/WeekText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="136dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/WeekBtnText"
+        android:textSize="24sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/TimeScale"
+        app:layout_constraintTop_toBottomOf="@+id/graph" />
 
-        <RadioButton
-            android:id="@+id/LatestDayBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_weight="1"
-            android:text="@string/LatestDayBtn"
-            app:layout_constraintStart_toStartOf="@+id/LatestHourBtn"
-            app:layout_constraintTop_toBottomOf="@+id/LatestHourBtn" />
+    <TextView
+        android:id="@+id/MonthText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="204dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/LatestMonthBtn"
+        android:textSize="24sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/TimeScale"
+        app:layout_constraintTop_toBottomOf="@+id/graph" />
 
-        <RadioButton
-            android:id="@+id/LatestWeekBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="33dp"
-            android:layout_marginTop="4dp"
-            android:layout_weight="1"
-            android:text="@string/WeekBtnText"
-            app:layout_constraintStart_toStartOf="@+id/LatestDayBtn"
-            app:layout_constraintTop_toBottomOf="@+id/LatestDayBtn" />
+    <TextView
+        android:id="@+id/YearText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="284dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/LatestYearBtn"
+        android:textSize="24sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/TimeScale"
+        app:layout_constraintTop_toBottomOf="@+id/graph" />
 
-        <RadioButton
-            android:id="@+id/LatestMonthBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_weight="1"
-            android:text="@string/LatestMonthBtn"
-            app:layout_constraintStart_toStartOf="@+id/LatestWeekBtn"
-            app:layout_constraintTop_toBottomOf="@+id/LatestWeekBtn" />
+    <TextView
+        android:id="@+id/PriceText"
+        android:layout_width="85dp"
+        android:layout_height="27dp"
+        android:textAlignment="viewStart"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="@+id/MonthText"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/WeekText"
+        app:layout_constraintTop_toBottomOf="@+id/TimeScale"
+        tools:text="0.003444$" />
 
-        <RadioButton
-            android:id="@+id/latestYearBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_weight="1"
-            android:text="@string/LatestYearBtn"
-            app:layout_constraintStart_toStartOf="@+id/LatestYearBtn"
-            app:layout_constraintTop_toBottomOf="@+id/LatestYearBtn" />
-    </RadioGroup>
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="@string/PriceText"
+        android:textAlignment="textEnd"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toStartOf="@+id/PriceText"
+        app:layout_constraintTop_toTopOf="@+id/PriceText"
+        tools:text="@string/PriceText" />
+
+    <TextView
+        android:id="@+id/ChangeFlatText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAlignment="viewStart"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="@+id/PriceText"
+        app:layout_constraintTop_toTopOf="@+id/textView7"
+        tools:text="245.5$" />
+
+    <TextView
+        android:id="@+id/textView7"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/ChangeFlatText"
+        android:textAlignment="textEnd"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="@+id/textView6"
+        app:layout_constraintTop_toBottomOf="@+id/textView6"
+        tools:text="Change(24H)" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="4dp"
+        android:text="@string/ChangePctText"
+        android:textAlignment="textEnd"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toStartOf="@+id/ChangePctText"
+        app:layout_constraintTop_toBottomOf="@+id/textView7" />
+
+    <TextView
+        android:id="@+id/ChangePctText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="3.456%"
+        android:textAlignment="viewStart"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="@+id/ChangeFlatText"
+        app:layout_constraintTop_toTopOf="@+id/textView4" />
+
+    <TextView
+        android:id="@+id/textView10"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="4dp"
+        android:text="@string/TotalSupplyText"
+        android:textAlignment="textEnd"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toStartOf="@+id/SupplyText"
+        app:layout_constraintTop_toBottomOf="@+id/textView4" />
+
+    <TextView
+        android:id="@+id/SupplyText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="9.995.555"
+        android:textAlignment="viewStart"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="@+id/ChangeFlatText"
+        app:layout_constraintTop_toTopOf="@+id/textView10" />
+
+    <TextView
+        android:id="@+id/textView11"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="4dp"
+        android:text="@string/MarketCapText"
+        android:textAlignment="textEnd"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toStartOf="@+id/MktCapText"
+        app:layout_constraintTop_toBottomOf="@+id/textView10" />
+
+    <TextView
+        android:id="@+id/MktCapText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="$9.995.555"
+        android:textAlignment="viewStart"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="@+id/ChangeFlatText"
+        app:layout_constraintTop_toTopOf="@+id/textView11" />
 
 </android.support.constraint.ConstraintLayout>

@@ -18,4 +18,10 @@
     <string name= "LatestYearBtn">Year</string>
     <string name="menu_subscribe">Subscribe</string>
     <string name="menu_unsubscribe">Unbsubscribe</string>
+    <string name="TotalVolText">Volume</string>
+    <string name="PriceText">Price</string>
+    <string name="ChangeFlatText">Change(24H)</string>
+    <string name="ChangePctText">%Change(24H)</string>
+    <string name="TotalSupplyText">Total Supply:</string>
+    <string name="MarketCapText">Market Cap:</string>
 </resources>
