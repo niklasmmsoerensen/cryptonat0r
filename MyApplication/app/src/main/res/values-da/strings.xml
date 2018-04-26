@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">CryptoNat0r</string>
+
+    <string name="navigation_drawer_open">Åben navigationsskuffe</string>
+    <string name="navigation_drawer_close">Luk navigationsskuffe</string>
+
+    <string name="action_settings">Indstillinger</string>
+    <string name="title_activity_trending">Trending valutaer</string>
+    <string name="AppName">Cryptonat0r</string>
+    <string name="AddCoinSuccesful">Ny valuta tilføjet!</string>
+    <string name="AddCoinFailed">Valutaen findes ikke!</string>
+    <string name="InsertCoinName">Indtast valutanavn:</string>
+    <string name="HourBtnText">Time</string>
+    <string name="LatestDayBtn">Dag</string>
+    <string name="WeekBtnText">Uge</string>
+    <string name="LatestMonthBtn">Måned</string>
+    <string name="GraphTimeText">Vis priser for sidste</string>
+    <string name= "LatestYearBtn">År</string>
+    <string name="menu_subscribe">Abonnér</string>
+    <string name="menu_unsubscribe">Fjern</string>
+</resources>

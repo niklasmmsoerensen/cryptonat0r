@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "29973631234",
+    "firebase_url": "https://cryptonat0r-fe631.firebaseio.com",
+    "project_id": "cryptonat0r-fe631",
+    "storage_bucket": "cryptonat0r-fe631.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:29973631234:android:ba47a4b9c4f451b7",
+        "android_client_info": {
+          "package_name": "com.example.krillinat0r.myapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "29973631234-7o9uo4e36mda8p2c3o1q29vfk5dvb4l3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.krillinat0r.myapplication",
+            "certificate_hash": "d976d540124a753783b111454fd127ee7703dd87"
+          }
+        },
+        {
+          "client_id": "29973631234-uo61ggkhsk7ckukibg1d7a5tfh4bn3gh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDENKH4meXyuLf8kHA8oZPiT8mUqtUrHto"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "29973631234-uo61ggkhsk7ckukibg1d7a5tfh4bn3gh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

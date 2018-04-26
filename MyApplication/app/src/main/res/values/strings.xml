@@ -5,15 +5,17 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
-    <string name="title_activity_trending">TrendingActivity</string>
+    <string name="title_activity_trending">Trending currencies</string>
     <string name="AppName">Cryptonat0r</string>
     <string name="AddCoinSuccesful">Succesfully added new coin!</string>
     <string name="AddCoinFailed">Coin cannot be found!</string>
     <string name="InsertCoinName">Enter new coin name:</string>
     <string name="HourBtnText">Hour</string>
     <string name="LatestDayBtn">Day</string>
-    <string name="WeekBtnText">Week</string>
+    <string name="WeekBtnText">Week</string>strings.xml
     <string name="LatestMonthBtn">Month</string>
     <string name="GraphTimeText">Show price of last</string>
     <string name= "LatestYearBtn">Year</string>
+    <string name="menu_subscribe">Subscribe</string>
+    <string name="menu_unsubscribe">Unbsubscribe</string>
 </resources>

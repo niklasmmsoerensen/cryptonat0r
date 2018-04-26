@@ -91,11 +91,15 @@ public class UpdatingService extends Service {
                 Log.d(LOG, "JSON ERROR: " + e.toString());
             }
         }
-        fetchPrices();
+        fetchPrices(false);
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private void fetchPrices() {
+    public void forceFetchPrices() {
+        fetchPrices(true);
+    }
+
+    private void fetchPrices(boolean forceUpdate) {
         String apiRequest = "";
         if(queue == null) {
             queue = Volley.newRequestQueue(this);
@@ -140,12 +144,14 @@ public class UpdatingService extends Service {
                 });
         queue.add(stringRequest);
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                    fetchPrices();
-            }
-        }, 10000);
+        if(!forceUpdate) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    fetchPrices(false);
+                }
+            }, 10000);
+        }
     }
 
     private void sendResult(int result, String type) {
@@ -183,15 +189,9 @@ public class UpdatingService extends Service {
         queue.add(stringRequest);
     }
 
-    public List<String> getJsonResponses() {
-        return jsonResponses;
-    }
-
     public List<CurrencyData> getSubscribedCurrencies() {
         return subscribedCurrencies;
     }
-
-    public List<CurrencyHistoricalDataPoints> getCurrencyHistoricalDataPointsList() { return currencyHistoricalDataPointsList; }
 
     public CurrencyHistoricalDataPoints getCurrencyHistoricalDataPoints(String currency) {
         for (int i = 0; i < currencyHistoricalDataPointsList.size(); i++) {
@@ -222,9 +222,27 @@ public class UpdatingService extends Service {
             Gson gson = new Gson();
             editor.putString(SUBSCRIBED_CURRENCIES, gson.toJson(subscribedCurrencies));
             editor.commit();
+            fetchPrices(true);
             return true;
         }
         return false;
+    }
+
+    public void removeCoin(String coin) {
+        for (int i = 0;i < subscribedCurrencies.size(); i++) {
+            if(subscribedCurrencies.get(i).getKey().equals(coin)) {
+                subscribedCurrencies.remove(i);
+
+                //save subscribed currencies to shared preferences
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+                SharedPreferences.Editor editor = preferences.edit();
+                Gson gson = new Gson();
+                editor.putString(SUBSCRIBED_CURRENCIES, gson.toJson(subscribedCurrencies));
+                editor.commit();
+                fetchPrices(true);
+                return;
+            }
+        }
     }
 
     public void fetchHistoricalData(String coin, GraphActivity.GraphTime type) {

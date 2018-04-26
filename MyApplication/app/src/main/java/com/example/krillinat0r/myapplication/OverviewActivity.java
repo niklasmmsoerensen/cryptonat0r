@@ -16,9 +16,12 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.InputType;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -51,8 +54,9 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
     private ListView CurrencyList;
     private CurrencyListAdapter adapter;
     private IntentFilter filter;
+    private SwipeRefreshLayout SwipeToRefresh;
 
-    //for bound counting service
+    //for bound updating service service
     private UpdatingService updatingService;
     private ServiceConnection updatingServiceConnection;
     private boolean bound = false;
@@ -89,6 +93,8 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
                 startActivity(graphIntent);
             }
         });
+
+        registerForContextMenu(CurrencyList);
 
         //start and setup connection to service
         Log.d(LOG, "Starting service");
@@ -155,6 +161,46 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
 
         navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        SwipeToRefresh = findViewById(R.id.SwipeToRefresh);
+        SwipeToRefresh.setOnRefreshListener(
+                new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        Log.i(LOG, "onRefresh called from SwipeRefreshLayout");
+
+                        // This method performs the actual data-refresh operation.
+                        // The method calls setRefreshing(false) when it's finished.
+                        if(updatingService != null) {
+                            updatingService.forceFetchPrices();
+                        }
+                    }
+                });
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        if (v.getId()==R.id.Currency_List) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.overview_currency_longpress_menu, menu);
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        CurrencyData currency = subscribedCurrencies.get(info.position);
+        String itemTitle = item.toString();
+        String unsubscribeItem = getString(R.string.menu_unsubscribe);
+
+        if(itemTitle.equals(unsubscribeItem)) {
+            updatingService.removeCoin(currency.getKey());
+            return true;
+        }
+        else {
+            return super.onContextItemSelected(item);
+        }
     }
 
     @Override
@@ -260,6 +306,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
                 //subscribedCurrencies = updatingService.getJsonResponses();
                 subscribedCurrencies.clear();
                 subscribedCurrencies.addAll(updatingService.getSubscribedCurrencies());
+                SwipeToRefresh.setRefreshing(false);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

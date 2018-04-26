@@ -1,7 +1,6 @@
 package com.example.krillinat0r.myapplication;
 
 import android.content.Context;
-import android.media.Image;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -48,7 +47,7 @@ public class CurrencyListAdapter extends BaseAdapter {
 
         View v = View.inflate(mContext, R.layout.item_currency_list, null);
 
-        TextView coinName = v.findViewById(R.id.Coin_Name);
+        TextView coinName = v.findViewById(R.id.txtTitle);
         coinName.setText(mCurrencyDataList.get(i).getKey()); //Set name
 
         TextView price = v.findViewById(R.id.Coin_Price);
