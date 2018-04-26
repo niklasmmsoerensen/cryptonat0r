@@ -87,16 +87,18 @@ public class GraphActivity extends AppCompatActivity {
 
         currentCurrency = (CurrencyData) getIntent().getParcelableExtra(CURRENCY);
 
-        DecimalFormat df = new DecimalFormat("#.##");
+        DecimalFormat df = new DecimalFormat("#.####");
 
         if(currentCurrency.getFlatChange() > 0) {
-            ChangeFlat.setText("+" + String.valueOf(df.format(currentCurrency.getFlatChange()))); //Set coin value change
+            ChangeFlat.setText("+$ " + String.valueOf(df.format(currentCurrency.getFlatChange()))); //Set coin value change
             ChangeFlat.setTextColor(getResources().getColor(R.color.PositivePrice));
         }
         else {
-            ChangeFlat.setText(String.valueOf(df.format(currentCurrency.getFlatChange()))); //Set coin value change
+            ChangeFlat.setText("$ " + String.valueOf(df.format(currentCurrency.getFlatChange()))); //Set coin value change
             ChangeFlat.setTextColor(getResources().getColor(R.color.NegativePrice));
         }
+
+        df = new DecimalFormat("#.##");
 
         if(currentCurrency.getPercentChange() > 0) {
             ChangePct.setText("+" + String.valueOf(df.format(currentCurrency.getPercentChange())) + " %"); //Set coin value change
