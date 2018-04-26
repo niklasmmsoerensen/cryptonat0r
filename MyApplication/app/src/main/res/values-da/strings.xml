@@ -18,4 +18,5 @@
     <string name= "LatestYearBtn">År</string>
     <string name="menu_subscribe">Abonnér</string>
     <string name="menu_unsubscribe">Fjern</string>
+    <string name="action_refresh">Refresh</string>
 </resources>
