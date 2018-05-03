@@ -125,6 +125,9 @@ public class UpdatingService extends Service {
                         //bound service should be able to access list by using GET method
                         List<CurrencyDetailData> updatedDetails = CurrencyJsonParser.parseCurrencyDetails(response);
 
+                        if(updatedDetails == null)
+                            updatedDetails = new ArrayList<>();
+
                         for(int i = 0; i < updatedDetails.size(); i++)
                         {
                             for(int j = 0; j < subscribedCurrencies.size(); j++)

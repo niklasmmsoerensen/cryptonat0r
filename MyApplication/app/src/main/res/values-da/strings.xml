@@ -18,5 +18,11 @@
     <string name= "LatestYearBtn">År</string>
     <string name="menu_subscribe">Abonnér</string>
     <string name="menu_unsubscribe">Fjern</string>
-    <string name="action_refresh">Refresh</string>
+    <string name="TotalVolText">Volume</string>
+    <string name="PriceText">Pris</string>
+    <string name="ChangeFlatText">Ændring(24t)</string>
+    <string name="ChangePctText">%Ændring(24t)</string>
+    <string name="TotalSupplyText">Forsyning:</string>
+    <string name="MarketCapText">Markedsværdi:</string>
+    <string name="action_refresh">Opdatér</string>
 </resources>

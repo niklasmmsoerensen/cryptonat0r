@@ -109,7 +109,7 @@
 
         <TextView
             android:id="@+id/PriceText"
-            android:layout_width="85dp"
+            android:layout_width="wrap_content"
             android:layout_height="27dp"
             android:layout_marginEnd="68dp"
             android:layout_marginTop="32dp"

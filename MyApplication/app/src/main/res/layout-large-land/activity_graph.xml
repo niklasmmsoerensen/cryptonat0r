@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.krillinat0r.myapplication.GraphActivity"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.example.krillinat0r.myapplication.GraphActivity">
+    android:layout_height="match_parent">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
     <com.jjoe64.graphview.GraphView
         android:id="@+id/graph"
@@ -46,31 +51,33 @@
         android:id="@+id/DayText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="68dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginStart="228dp"
+        android:layout_marginTop="16dp"
         android:text="@string/LatestDayBtn"
         android:textSize="24sp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintStart_toStartOf="@+id/TimeScale"
         app:layout_constraintTop_toBottomOf="@+id/graph" />
 
-    <TextView
-        android:id="@+id/WeekText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="136dp"
-        android:layout_marginTop="8dp"
-        android:text="@string/WeekBtnText"
-        android:textSize="24sp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/TimeScale"
-        app:layout_constraintTop_toBottomOf="@+id/graph" />
+        <TextView
+            android:id="@+id/WeekText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/WeekBtnText"
+            android:textSize="24sp"
+            app:layout_constraintEnd_toEndOf="@+id/TimeScale"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/TimeScale"
+            app:layout_constraintTop_toBottomOf="@+id/graph" />
 
     <TextView
         android:id="@+id/MonthText"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="204dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="676dp"
         android:layout_marginTop="8dp"
         android:text="@string/LatestMonthBtn"
         android:textSize="24sp"
@@ -82,7 +89,7 @@
         android:id="@+id/YearText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="284dp"
+        android:layout_marginStart="924dp"
         android:layout_marginTop="8dp"
         android:text="@string/LatestYearBtn"
         android:textSize="24sp"
@@ -93,14 +100,16 @@
     <TextView
         android:id="@+id/PriceText"
         android:layout_width="wrap_content"
-        android:layout_height="27dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="46dp"
+        android:layout_marginTop="16dp"
         android:textAlignment="viewStart"
-        android:textSize="20sp"
+        android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="@+id/MonthText"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/WeekText"
+        app:layout_constraintStart_toStartOf="@+id/WeekText"
         app:layout_constraintTop_toBottomOf="@+id/TimeScale"
         tools:text="0.003444$" />
 
@@ -108,10 +117,10 @@
         android:id="@+id/textView6"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="32dp"
         android:text="@string/PriceText"
         android:textAlignment="textEnd"
-        android:textSize="20sp"
+        android:textSize="30sp"
         app:layout_constraintEnd_toStartOf="@+id/PriceText"
         app:layout_constraintTop_toTopOf="@+id/PriceText"
         tools:text="@string/PriceText" />
@@ -121,7 +130,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textAlignment="viewStart"
-        android:textSize="20sp"
+        android:textSize="30sp"
         app:layout_constraintStart_toStartOf="@+id/PriceText"
         app:layout_constraintTop_toTopOf="@+id/textView7"
         tools:text="245.5$" />
@@ -130,10 +139,9 @@
         android:id="@+id/textView7"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
         android:text="@string/ChangeFlatText"
         android:textAlignment="textEnd"
-        android:textSize="20sp"
+        android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="@+id/textView6"
         app:layout_constraintTop_toBottomOf="@+id/textView6"
         tools:text="Change(24H)" />
@@ -142,12 +150,11 @@
         android:id="@+id/textView4"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:layout_marginTop="4dp"
         android:text="@string/ChangePctText"
         android:textAlignment="textEnd"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toStartOf="@+id/ChangePctText"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="@+id/textView7"
         app:layout_constraintTop_toBottomOf="@+id/textView7" />
 
     <TextView
@@ -156,7 +163,7 @@
         android:layout_height="wrap_content"
         android:text="3.456%"
         android:textAlignment="viewStart"
-        android:textSize="20sp"
+        android:textSize="30sp"
         app:layout_constraintStart_toStartOf="@+id/ChangeFlatText"
         app:layout_constraintTop_toTopOf="@+id/textView4" />
 
@@ -164,21 +171,21 @@
         android:id="@+id/textView10"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:layout_marginTop="4dp"
         android:text="@string/TotalSupplyText"
         android:textAlignment="textEnd"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toStartOf="@+id/SupplyText"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="@+id/textView4"
         app:layout_constraintTop_toBottomOf="@+id/textView4" />
 
     <TextView
         android:id="@+id/SupplyText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
         android:text="9.995.555"
         android:textAlignment="viewStart"
-        android:textSize="20sp"
+        android:textSize="30sp"
         app:layout_constraintStart_toStartOf="@+id/ChangeFlatText"
         app:layout_constraintTop_toTopOf="@+id/textView10" />
 
@@ -186,12 +193,10 @@
         android:id="@+id/textView11"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="4dp"
         android:text="@string/MarketCapText"
         android:textAlignment="textEnd"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toStartOf="@+id/MktCapText"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="@+id/textView10"
         app:layout_constraintTop_toBottomOf="@+id/textView10" />
 
     <TextView
@@ -200,8 +205,10 @@
         android:layout_height="wrap_content"
         android:text="$9.995.555"
         android:textAlignment="viewStart"
-        android:textSize="20sp"
+        android:textSize="30sp"
         app:layout_constraintStart_toStartOf="@+id/ChangeFlatText"
         app:layout_constraintTop_toTopOf="@+id/textView11" />
 
-</android.support.constraint.ConstraintLayout>
+
+    </android.support.constraint.ConstraintLayout>
+</ScrollView>

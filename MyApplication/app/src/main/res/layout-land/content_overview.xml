@@ -8,6 +8,22 @@
     tools:context="com.example.krillinat0r.myapplication.OverviewActivity"
     tools:showIn="@layout/app_bar_overview">
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/add_Coin_Btn"
+        android:layout_width="50dp"
+        android:layout_height="53dp"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:layout_marginBottom="16dp"
+        android:tint="@color/colorKindaWhite"
+        app:backgroundTint="@color/colorPrimaryDark"
+        app:elevation="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:rippleColor="@color/colorPrimaryDark"
+        app:srcCompat="@android:drawable/ic_menu_add" />
+
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/SwipeToRefresh"
         android:layout_width="match_parent"
@@ -28,20 +44,5 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="1.0" />
     </android.support.v4.widget.SwipeRefreshLayout>
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/add_Coin_Btn"
-        android:layout_width="50dp"
-        android:layout_height="53dp"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:layout_marginBottom="16dp"
-        app:backgroundTint="@color/colorPrimaryDark"
-        app:elevation="12dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.499"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:srcCompat="@android:drawable/ic_input_add" />
 
 </android.support.constraint.ConstraintLayout>

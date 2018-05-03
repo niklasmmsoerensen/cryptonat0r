@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>13</zoom_level>
+  <element>
+    <id>UMLSequenceAllInOne</id>
+    <coordinates>
+      <x>0</x>
+      <y>0</y>
+      <w>1482</w>
+      <h>624</h>
+    </coordinates>
+    <panel_attributes>title=Fetch Coinlist
+obj=Overview~O
+obj=CurrencyJsonParser~CJP
+obj=UpdatingService~US
+obj=CryptoCompare API~API
+
+tick=
+on=O, US
+
+O-&gt;US: FetchCoinList()
+off=O;
+
+US-&gt;API: HTTPRequest(CoinList)
+API.&gt;US: onResponse(resp)
+
+on=CJP
+
+US-&gt;CJP: parseCurrencyHashMapJson(resp)
+CJP.&gt;US: CurrencyMap
+off=CJP
+
+US: LocalBroadcast(result)</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>
