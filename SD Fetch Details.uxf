@@ -5,39 +5,45 @@
     <id>UMLSequenceAllInOne</id>
     <coordinates>
       <x>78</x>
-      <y>13</y>
-      <w>1014</w>
-      <h>871</h>
+      <y>0</y>
+      <w>1079</w>
+      <h>1157</h>
     </coordinates>
-    <panel_attributes>title=Fetch Currency List
+    <panel_attributes>title=Fetch Currency Details
 obj=Overview : Activity~O
 obj=CurrencyJsonParser : Class~CJP
 obj=UpdatingService : BoundService~US
 obj=CryptoCompare : API~API
 
 tick=
-on=O, US
+on=US
+combinedFragment=loop~loop1 US US;
 
-O-&gt;US: Update currency list
-off=O;
-
+US:[Every 10 seconds]
 on=API
-US-&gt;API: HTTP request currency list
-API.&gt;US: Response
+US-&gt;API: HTTP request details of currencies
+API.&gt;US: JSON
 off=API
 
 on=CJP
 
 US-&gt;&gt;&gt;CJP: Parse JSON
-CJP.&gt;US: HashMap response
+CJP.&gt;US: List of currency details
 off=CJP
 
-US: [Broadcast result]
+US: [Broadcast list update]
 
 on=O
 
 US.&gt;O: Receive broadcast
-off=O,US;</panel_attributes>
+--
+off=US;
+on=US
+O-&gt;US: Get subcribed currencies
+US.&gt;O: Currency list
+off=US;
+O: [Update subscribed currencies list]
+off=O</panel_attributes>
     <additional_attributes/>
   </element>
 </diagram>
