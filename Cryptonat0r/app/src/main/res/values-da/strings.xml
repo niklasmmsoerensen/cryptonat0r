@@ -22,7 +22,7 @@
     <string name="PriceText">Pris</string>
     <string name="ChangeFlatText">Ændring(24t)</string>
     <string name="ChangePctText">%Ændring(24t)</string>
-    <string name="TotalSupplyText">Forsyning:</string>
+    <string name="TotalSupplyText">Udbud:</string>
     <string name="MarketCapText">Markedsværdi:</string>
     <string name="action_refresh">Opdatér</string>
 </resources>
