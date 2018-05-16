@@ -193,14 +193,50 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         CurrencyData currency = subscribedCurrencies.get(info.position);
         String itemTitle = item.toString();
         String unsubscribeItem = getString(R.string.menu_unsubscribe);
+        String addWatchItem = getString(R.string.menu_addWatch);
+        String key = currency.getKey();
 
         if(itemTitle.equals(unsubscribeItem)) {
-            updatingService.removeCoin(currency.getKey());
+            updatingService.removeCoin(key);
+            return true;
+        }
+        else if(itemTitle.equals(addWatchItem)) {
+            showAddWatchDialog(key);
             return true;
         }
         else {
             return super.onContextItemSelected(item);
         }
+    }
+
+    private void showAddWatchDialog(final String key) {
+        builder = new AlertDialog.Builder(OverviewActivity.this);
+        builder.setTitle(getString(R.string.AddWatchDialogTitle));
+        final EditText input = new EditText(OverviewActivity.this);
+        input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_VARIATION_NORMAL);
+        builder.setView(input);
+
+        // Set up the buttons
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if(updatingService != null && updatingServiceConnection != null)
+                {
+                    updatingService.addCoinToWatch(key, Float.valueOf(input.getText().toString()));
+                    //add coin to watch
+                    Toast.makeText(OverviewActivity.this, "You will get a notification when " + key + " is worth " + input.getText().toString() + " USD!", Toast.LENGTH_SHORT).show();
+                }
+                dialog.dismiss();
+            }
+        });
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
     }
 
     @Override
@@ -220,9 +256,23 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
 
     @Override
     public void onStop() {
+        Log.i(LOG, "ON STOP");
         LocalBroadcastManager.getInstance(this).unregisterReceiver(onUpdatingServiceCoinListResult);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(onUpdatingServicePricesResult);
         super.onStop();
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.i(LOG, "ON DESTROY");
+        if(updatingService != null) {
+            if(updatingService.getWatchedCurrenciesMap() == null) {
+                //we don't have watched currencies, shut down service as well
+                Intent stopService = new Intent(OverviewActivity.this, UpdatingService.class);
+                stopService(stopService);
+            }
+        }
+        super.onDestroy();
     }
 
     @Override

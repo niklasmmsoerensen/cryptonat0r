@@ -1,12 +1,19 @@
 package com.example.krillinat0r.myapplication;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -21,7 +28,10 @@ import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Currency;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +46,13 @@ public class UpdatingService extends Service {
     public static final int REQUEST_SUCCESS = 0;
     public static final int REQUEST_ERROR = 1;
     public static final String SUBSCRIBED_CURRENCIES = "SubscribedCurrencies";
+    public static final String WATCHED_CURRENCIES = "WatchedCurrencies";
+
+    //Notification stuff
+    private final static int NOTIFICATION_ID = 1;
+    private final static String CHANNEL_ID = "UpdatingServiceChannel";
+    private final static String CHANNEL_NAME = "UpdatingService Channel";
+    private final static String CHANNEL_DESCRIPTION = "Channel to display notifications from UpdatingService";
 
     private static final String fetchDetailsBaseURL = "https://min-api.cryptocompare.com/data/pricemultifull?fsyms=";
     private static final String currencyPrefix = "&tsyms=";
@@ -49,6 +66,7 @@ public class UpdatingService extends Service {
     private List<String> jsonResponses = new ArrayList<>();
     private HashMap<String, CurrencyMapValue> currencyMap = new HashMap<>();
     private List<CurrencyHistoricalDataPoints> currencyHistoricalDataPointsList = new ArrayList<>();
+    private HashMap<String, Float> watchedCurrenciesMap = new HashMap<>();
 
     RequestQueue queue;
 
@@ -79,6 +97,7 @@ public class UpdatingService extends Service {
         //get sharedPreferences data
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         String subscribedCurrenciesJson = preferences.getString(SUBSCRIBED_CURRENCIES, "");
+        String watchedCurrenciesJson = preferences.getString(WATCHED_CURRENCIES, "");
         if(subscribedCurrenciesJson != "") {
             Gson gson = new Gson();
             try{
@@ -86,6 +105,12 @@ public class UpdatingService extends Service {
                 ArrayList<CurrencyData> sharedPrefSubs = gson.fromJson(subscribedCurrenciesJson, type);
                 subscribedCurrencies.clear();
                 subscribedCurrencies.addAll(sharedPrefSubs);
+                type = new TypeToken<HashMap<String, Float>>(){}.getType();
+                HashMap<String, Float> sharedPrefsWatched = gson.fromJson(watchedCurrenciesJson, type);
+                if(sharedPrefsWatched != null) {
+                    watchedCurrenciesMap.clear();
+                    watchedCurrenciesMap.putAll(sharedPrefsWatched);
+                }
             }
             catch(JsonParseException e)   {
                 Log.d(LOG, "JSON ERROR: " + e.toString());
@@ -143,6 +168,8 @@ public class UpdatingService extends Service {
                                 }
                             }
                         }
+                        //check if any currency reached a watched currency target price
+                        checkForWatchedCurrencies();
                         sendResult(REQUEST_SUCCESS, BROADCAST_UPDATING_SERVICE_PRICES_RESULT);
                     }
                 },
@@ -203,6 +230,10 @@ public class UpdatingService extends Service {
         return subscribedCurrencies;
     }
 
+    public HashMap<String, Float> getWatchedCurrenciesMap() {
+        return watchedCurrenciesMap;
+    }
+
     public CurrencyHistoricalDataPoints getCurrencyHistoricalDataPoints(String currency) {
         for (int i = 0; i < currencyHistoricalDataPointsList.size(); i++) {
             if(currencyHistoricalDataPointsList.get(i).currency.equals(currency)) {
@@ -253,6 +284,65 @@ public class UpdatingService extends Service {
                 return;
             }
         }
+    }
+
+    public void addCoinToWatch(String coin, Float watchPrice) {
+        //can only have one watch per coin, replace current value if entry already exists
+        watchedCurrenciesMap.put(coin, watchPrice);
+
+        //save watched currencies to shared preferences
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = preferences.edit();
+        Gson gson = new Gson();
+        editor.putString(WATCHED_CURRENCIES, gson.toJson(getWatchedCurrenciesMap()));
+        editor.commit();
+    }
+
+    private void checkForWatchedCurrencies() {
+        CurrencyData element = null;
+        for (int i = 0; i < subscribedCurrencies.size(); i++) {
+            element = subscribedCurrencies.get(i);
+            if(watchedCurrenciesMap.containsKey(element.getKey())) { //if element is watched
+                Float price = element.getCoinPrice();
+                Float watchPrice = watchedCurrenciesMap.get(element.getKey());
+                if((price + 2F) >= watchPrice && (price - 2F) <= watchPrice) { //only trigger if price is 2 USD over or under target price
+                    //price has reached watched price, show notification
+                    showNotification(element.getKey(), element.getCoinPrice());
+                    watchedCurrenciesMap.remove(element.getKey()); //remove watch when target is reached
+                }
+            }
+        }
+    }
+
+    private void showNotification(String key, Float price) {
+        //region notification stuff
+        //reference: https://developer.android.com/training/notify-user/build-notification.html#Priority
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Create the NotificationChannel, but only on API 26+ because
+            // the NotificationChannel class is a new thing
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setDescription(CHANNEL_DESCRIPTION);
+            // Register the channel with the system
+            NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            manager.createNotificationChannel(channel);
+        }
+
+        //notification stuff heavily inspired by docs: https://developer.android.com/training/notify-user/build-notification.html
+        Intent notificationTapIntent = new Intent(UpdatingService.this, OverviewActivity.class);
+        notificationTapIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(UpdatingService.this, 0, notificationTapIntent, 0);
+
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(UpdatingService.this, CHANNEL_ID)
+                .setSmallIcon(R.drawable.price_watch_icon)
+                .setContentTitle(getResources().getString(R.string.PriceWatchNotificationTitle))
+                .setContentText(key + " " + getResources().getString(R.string.PriceWatchNotificationContent) + " " + price + " USD")
+                .setContentIntent(pendingIntent)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+        //show the notification
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(UpdatingService.this);
+        notificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+        //endregion
     }
 
     public void fetchHistoricalData(String coin, GraphActivity.GraphTime type) {

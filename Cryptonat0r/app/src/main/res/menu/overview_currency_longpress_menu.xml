@@ -3,6 +3,8 @@
     android:layout_height="wrap_content"
     android:layout_width="wrap_content"
     xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/addWatch"
+        android:title="@string/menu_addWatch" />
     <item android:id="@+id/onsubscribe"
         android:title="@string/menu_unsubscribe" />
 </menu>

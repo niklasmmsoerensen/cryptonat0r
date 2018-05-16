@@ -25,4 +25,8 @@
     <string name="TotalSupplyText">Udbud:</string>
     <string name="MarketCapText">Markedsværdi:</string>
     <string name="action_refresh">Opdatér</string>
+    <string name="menu_addWatch">Tilføj overvågning</string>
+    <string name="AddWatchDialogTitle">Indtast pris for overvågning</string>
+    <string name="PriceWatchNotificationTitle">Pris overvågning</string>
+    <string name="PriceWatchNotificationContent">er nu prissat til</string>
 </resources>

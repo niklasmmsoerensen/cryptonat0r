@@ -25,4 +25,8 @@
     <string name="TotalSupplyText">Total Supply:</string>
     <string name="MarketCapText">Market Cap:</string>
     <string name="action_refresh">Refresh</string>
+    <string name="menu_addWatch">Add watch</string>
+    <string name="AddWatchDialogTitle">Enter price for watch</string>
+    <string name="PriceWatchNotificationTitle">Price watch</string>
+    <string name="PriceWatchNotificationContent">is now worth</string>
 </resources>
