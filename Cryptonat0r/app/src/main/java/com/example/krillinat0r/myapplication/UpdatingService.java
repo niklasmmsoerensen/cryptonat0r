@@ -126,12 +126,12 @@ public class UpdatingService extends Service {
 
     private void fetchDetails(boolean forceUpdate) {
         String apiRequest = "";
-        if(queue == null) {
+        if(queue == null) { //singleton request queue is recommended
             queue = Volley.newRequestQueue(this);
         }
 
         apiRequest = fetchDetailsBaseURL;
-        for(int i = 0; i < subscribedCurrencies.size(); i++) {
+        for(int i = 0; i < subscribedCurrencies.size(); i++) { //format API request
             if((i+1) != subscribedCurrencies.size()) {
                 apiRequest += subscribedCurrencies.get(i).getKey() + ",";
             }
@@ -147,7 +147,6 @@ public class UpdatingService extends Service {
                     public void onResponse(String response) {
                         //set private list of coins in here and broadcast
                         //that request was OK/FAIL
-                        //bound service should be able to access list by using GET method
                         List<CurrencyDetailData> updatedDetails = CurrencyJsonParser.parseCurrencyDetails(response);
 
                         if(updatedDetails == null)

@@ -169,8 +169,6 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
                     public void onRefresh() {
                         Log.i(LOG, "onRefresh called from SwipeRefreshLayout");
 
-                        // This method performs the actual data-refresh operation.
-                        // The method calls setRefreshing(false) when it's finished.
                         if(updatingService != null) {
                             updatingService.forceFetchDetails();
                         }
@@ -224,7 +222,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
                 {
                     updatingService.addCoinToWatch(key, Float.valueOf(input.getText().toString()));
                     //add coin to watch
-                    Toast.makeText(OverviewActivity.this, "You will get a notification when " + key + " is worth " + input.getText().toString() + " USD!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(OverviewActivity.this, getResources().getString(R.string.PriceWatchToastPart1) + " " + key + " " + getResources().getString(R.string.PriceWatchToastPart2) + " " + input.getText().toString() + " " + getResources().getString(R.string.PriceWatchToastPart3), Toast.LENGTH_SHORT).show();
                 }
                 dialog.dismiss();
             }

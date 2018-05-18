@@ -29,4 +29,7 @@
     <string name="AddWatchDialogTitle">Enter price for watch</string>
     <string name="PriceWatchNotificationTitle">Price watch</string>
     <string name="PriceWatchNotificationContent">is now worth</string>
+    <string name="PriceWatchToastPart1">You will get a notification when </string>
+    <string name="PriceWatchToastPart2"> is worth </string>
+    <string name="PriceWatchToastPart3"> USD!</string>
 </resources>

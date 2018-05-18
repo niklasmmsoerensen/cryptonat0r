@@ -27,6 +27,9 @@
     <string name="action_refresh">Opdatér</string>
     <string name="menu_addWatch">Tilføj overvågning</string>
     <string name="AddWatchDialogTitle">Indtast pris for overvågning</string>
-    <string name="PriceWatchNotificationTitle">Pris overvågning</string>
+    <string name="PriceWatchNotificationTitle">Prisovervågning</string>
     <string name="PriceWatchNotificationContent">er nu prissat til</string>
+    <string name="PriceWatchToastPart1">Du får en notifikation når </string>
+    <string name="PriceWatchToastPart2">er prissat til</string>
+    <string name="PriceWatchToastPart3">USD!</string>
 </resources>

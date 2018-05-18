@@ -424,4 +424,12 @@ public class GraphActivity extends AppCompatActivity {
         graph.addSeries(series);
 
     }
+
+    @Override
+    public void onStop() {
+        //cleanup
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(onUpdatingServiceCoinHistoryResult);
+        unbindService(updatingServiceConnection);
+        super.onStop();
+    }
 }
